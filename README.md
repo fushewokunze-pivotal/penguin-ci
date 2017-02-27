@@ -4,11 +4,11 @@
 
 Documentation available here: [https://bosh.io/docs/cli-v2.html](https://bosh.io/docs/cli-v2.html)
 
-**Get bosh bootloader **
+**Get bosh bootloader**
 
 git clone [https://github.com/cloudfoundry/bosh-bootloader.git](https://github.com/cloudfoundry/bosh-bootloader.git)
 
-### **Configure AWS **
+**Configure AWS**
 
 The AWS IAM user that is provided to bbl will need the following policy:
 
