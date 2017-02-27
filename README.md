@@ -9,6 +9,7 @@ Documentation available here: [https://bosh.io/docs/cli-v2.html](https://bosh.io
 ```
 git clone https://github.com/cloudfoundry/bosh-bootloader.git
 ```
+Full documentation is here: https://github.com/cloudfoundry/bosh-bootloader/blob/master/docs/getting-started-aws.md
 
 **Configure AWS**
 
