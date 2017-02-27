@@ -158,3 +158,7 @@ penguin_domain:
 ```
 $ fly --target cf-deploy set-pipeline --config pipeline.yml --pipeline cf-deploy -l credentials.yml
 ```
+**Run pipeline**
+
+Login into Concourse UI via the browser and run the pipelines
+
