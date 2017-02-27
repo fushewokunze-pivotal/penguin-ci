@@ -7,7 +7,7 @@ Documentation available here: [https://bosh.io/docs/cli-v2.html](https://bosh.io
 **Get bosh bootloader**
 
 ```
-git clone [https://github.com/cloudfoundry/bosh-bootloader.git](https://github.com/cloudfoundry/bosh-bootloader.git)
+git clone https://github.com/cloudfoundry/bosh-bootloader.git
 ```
 
 **Configure AWS**
@@ -46,7 +46,7 @@ bbl up \
     --iaas aws
 ```
 
-**Create Concourse lbs **
+**Create Concourse lbs**
 
 Create self signed certificate for lb.
 
@@ -93,7 +93,7 @@ $ bosh cloud-config
 **Deploy Concourse**
 
 ```
-git clone [https://github.com/fushewokunze-pivotal/penguin-ci.git](https://github.com/fushewokunze-pivotal/penguin-ci.git)
+git clone https://github.com/fushewokunze-pivotal/penguin-ci.git
 
 $ bosh -e <director_ip> deploy concourse.yml --ca-cert directorSSLCA -d concourse
 ```
@@ -117,7 +117,7 @@ Make sure you use a key with no passphrase as Concourse does not support passphr
 **Get concourse pipeline**
 
 ```
-git clone [https://github.com/fushewokunze-pivotal/penguin-ci.git](https://github.com/fushewokunze-pivotal/penguin-ci.git)
+git clone https://github.com/fushewokunze-pivotal/penguin-ci.git
 ```
 
 **Create a credentials file**
