@@ -90,6 +90,12 @@ $ bosh cloud-config
 ...
 ```
 
+**Upload stemcell**
+
+```
+$ bosh upload stemcell https://s3.amazonaws.com/bosh-core-stemcells/aws/bosh-stemcell-3363.9-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
+```
+
 **Deploy Concourse**
 
 ```
@@ -119,6 +125,17 @@ Make sure you use a key with no passphrase as Concourse does not support passphr
 ```
 git clone https://github.com/fushewokunze-pivotal/penguin-ci.git
 ```
+
+**Update pipeline**
+
+Update pipeline file to use your own private repo for storing secrets by replacing all occurances of:
+
+```
+uri: git@github.com:fushewokunze-pivotal/penguin-env.git
+```
+
+with your your private repo.
+
 
 **Create a credentials file**
 
