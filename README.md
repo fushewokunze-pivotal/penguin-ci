@@ -34,7 +34,7 @@ The AWS IAM user that is provided to bbl will need the following policy:
 }
 ```
 
-**Creating infrastructure and BOSH director**
+**Create infrastructure and BOSH director**
 
 bbl will create infrastructure and deploy a BOSH director with the following command:
 
