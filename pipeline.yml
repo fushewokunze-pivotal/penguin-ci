@@ -1,0 +1,192 @@
+---
+groups:
+- name: cf-deployment
+  jobs:
+  - setup-infrastructure
+  - deploy
+  - acceptance-tests
+
+resources:
+- name: cf-deployment-concourse-tasks
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/fushewokunze-pivotal/cf-deployment-concourse-tasks.git
+- name: runtime-ci
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/runtime-ci.git
+- name: penguin-env-director-state
+  type: git
+  source:
+    branch: master
+    uri: git@github.com:fushewokunze-pivotal/penguin-env.git 
+    private_key: {{penguin_env_private_key}} 
+    paths:
+    - bbl-state.json
+- name: penguin-env-integration-configs
+  type: git
+  source:
+    branch: master
+    uri: git@github.com:fushewokunze-pivotal/penguin-env.git
+    private_key: {{penguin_env_private_key}}
+    paths:
+    - integration_config.json
+- name: penguin-env-vars-store
+  type: git
+  source:
+    branch: master
+    uri: git@github.com:fushewokunze-pivotal/penguin-env.git
+    private_key: {{penguin_env_private_key}}
+    paths:
+    - deployment-vars.yml
+- name: windows-stemcell
+  type: s3
+  source:
+    bucket: bosh-windows-stemcells
+    regexp: light-bosh-stemcell-(.*)-aws-xen-hvm-windows2012R2-go_agent.tgz
+- name: cf-deployment
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/fushewokunze-pivotal/cf-deployment.git
+- name: cf-acceptance-tests
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/cf-acceptance-tests
+- name: cats-concourse-task
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/cats-concourse-task.git
+
+jobs:
+- name: setup-infrastructure
+  serial_groups: [penguin]
+  public: true
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: penguin-env-director-state
+    - get: runtime-ci
+  - task: setup-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-up/task.yml
+    params:
+      BBL_IAAS: aws
+      BBL_AWS_REGION: us-west-1
+      BBL_AWS_ACCESS_KEY_ID: {{penguin_aws_access_key_id}}
+      BBL_AWS_SECRET_ACCESS_KEY: {{penguin_aws_secret_access_key}}
+      BBL_LB_CERT: {{penguin_lbs_ssl_cert}} 
+      BBL_LB_KEY: {{penguin_lbs_ssl_signing_key}} 
+      BBL_ENV_NAME: penguin-upgrade
+    input_mapping:
+      bbl-state: penguin-env-director-state
+    ensure:
+      put: penguin-env-director-state
+      params:
+        repository: updated-bbl-state
+  - task: bind-elb-to-r53
+    file: runtime-ci/scripts/ci/bind-elb-to-r53/task.yml
+    input_mapping:
+      env-repo: updated-bbl-state
+    params:
+      AWS_ACCESS_KEY_ID: {{penguin_aws_access_key_id}}
+      AWS_SECRET_ACCESS_KEY: {{penguin_aws_secret_access_key}}
+      DOMAIN: {{penguin_domain}} 
+
+- name: deploy
+  serial_groups: [penguin]
+  public: true
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: runtime-ci
+    - get: cf-deployment-concourse-tasks
+    - get: cf-deployment
+      trigger: true
+    - get: penguin-env-vars-store
+    - get: penguin-env-director-state
+      passed: [ setup-infrastructure ]
+    - get: penguin-env-integration-configs
+    - get: windows-stemcell
+  - task: bosh-upload-stemcell-upgrade
+    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
+    input_mapping:
+      cf-deployment: cf-deployment
+      bbl-state: penguin-env-director-state
+    params:
+      INFRASTRUCTURE: aws
+  - task: bosh-upload-windows-stemcell
+    file: runtime-ci/scripts/ci/bosh-upload-stemcell/task.yml
+    input_mapping:
+      stemcell: windows-stemcell
+      bbl-state: penguin-env-director-state
+    params:
+      STEMCELL_NAME: '*.tgz'
+  - task: bosh-deploy-cf
+    file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
+    input_mapping:
+      bbl-state: penguin-env-director-state
+      cf-deployment: cf-deployment
+      ops-files: cf-deployment
+      vars-store: penguin-env-vars-store
+    params:
+      SYSTEM_DOMAIN: {{penguin_domain}}
+      OPS_FILES: "operations/change-logging-port-for-aws-elb.yml operations/windows-cell.yml operations/use-only-local-route-emitters.yml"
+    ensure:
+      put: penguin-env-vars-store
+      params:
+        repository: updated-vars-store
+        rebase: true
+  - task: run-bosh-cleanup
+    file: runtime-ci/scripts/ci/run-bosh-cleanup/task.yml
+    input_mapping:
+      bbl-state: penguin-env-director-state
+  - task: update-integration-configs
+    file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
+    params:
+      CATS_INTEGRATION_CONFIG_FILE: integration_config.json
+    input_mapping:
+      vars-store: penguin-env-vars-store
+      integration-configs: penguin-env-integration-configs
+    ensure:
+      put: penguin-env-integration-configs
+      params:
+        repository: updated-integration-configs
+        rebase: true
+
+- name: acceptance-tests
+  serial_groups: [penguin]
+  public: true
+  build_logs_to_retain: 100
+  plan:
+  - timeout: 4h
+    do:
+    - aggregate:
+      - get: cf-deployment-concourse-tasks
+      - get: cf-acceptance-tests
+      - get: penguin-env-director-state
+        trigger: true
+        passed: [ deploy ]
+      - get: penguin-env-integration-configs
+        trigger: true
+      - get: penguin-env-vars-store
+        trigger: true
+        passed: [ deploy ]
+      - get: cf-deployment
+        trigger: true
+        passed: [ deploy ]
+      - get: cats-concourse-task
+    - task: enable-docker-and-tasks
+      file: cf-deployment-concourse-tasks/set-feature-flags/task.yml
+      input_mapping:
+        vars-store: penguin-env-vars-store
+      params:
+        SYSTEM_DOMAIN: {{penguin_domain}}
+    - task: run-cats
+      input_mapping:
+      - integration-config: penguin-env-integration-configs
+      file: cats-concourse-task/task.yml
