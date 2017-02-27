@@ -51,6 +51,7 @@ instance_groups:
         password: password
         role: atc
 - name: worker
+  persistent_disk_type: 50GB
   instances: 2
   vm_type: m3.medium
   vm_extensions: 
