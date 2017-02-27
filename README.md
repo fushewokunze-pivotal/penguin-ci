@@ -6,7 +6,9 @@ Documentation available here: [https://bosh.io/docs/cli-v2.html](https://bosh.io
 
 **Get bosh bootloader**
 
+```
 git clone [https://github.com/cloudfoundry/bosh-bootloader.git](https://github.com/cloudfoundry/bosh-bootloader.git)
+```
 
 **Configure AWS**
 
@@ -34,9 +36,9 @@ The AWS IAM user that is provided to bbl will need the following policy:
 
 **Creating infrastructure and BOSH director**
 
-```
 bbl will create infrastructure and deploy a BOSH director with the following command:
 
+```
 bbl up \
     --aws-access-key-id <INSERT ACCESS KEY ID> \
     --aws-secret-access-key <INSERT SECRET ACCESS KEY> \
