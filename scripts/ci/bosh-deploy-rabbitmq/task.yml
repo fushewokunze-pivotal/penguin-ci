@@ -10,6 +10,7 @@ inputs:
 - name: bbl-state
 - name: runtime-ci
 - name: stemcell
+- name: penguin-ci
 
 run:
   path: penguin-ci/scripts/ci/bosh-deploy-rabbitmq/task
