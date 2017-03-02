@@ -22,7 +22,7 @@ function bosh_deploy() {
 
   pushd penguin-ci
     local deployment_name
-    deployment_name=$(bosh interpolate "manifests/rabbitmq/rabbimq.yml" --path=/name)
+    deployment_name=$(bosh interpolate "manifests/rabbitmq/rabbitmq.yml" --path=/name)
 
     bosh \
       -n \
