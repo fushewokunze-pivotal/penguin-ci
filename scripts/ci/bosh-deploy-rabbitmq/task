@@ -28,7 +28,7 @@ function bosh_deploy() {
       -n \
       -d "${deployment_name}" \
       deploy manifests/rabbitmq/rabbitmq.yml 
-      
+
   popd
 }
 
@@ -38,3 +38,5 @@ function main() {
 }
 
 main
+
+
