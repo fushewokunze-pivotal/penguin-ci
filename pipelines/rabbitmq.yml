@@ -22,6 +22,14 @@ resources:
     branch: master
     uri: https://github.com/cloudfoundry/runtime-ci.git
 
+- name: penguin-ci
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/fushewokunze-pivotal/penguin-ci.git
+
+
+
 jobs:
 - name: deploy-rabbitmq-standalone
   public: true
@@ -33,6 +41,8 @@ jobs:
     - get: penguin-env-director-state
       trigger: true
     - get: runtime-ci
+    - get: penguin-ci
+      trigger: true
   - task: deploy-rabbitmq
     file: penguin-ci/scripts/ci/bosh-deploy-rabbitmq/task.yml
     input_mapping:

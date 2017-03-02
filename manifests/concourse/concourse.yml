@@ -57,7 +57,7 @@ instance_groups:
   vm_type: m3.medium
   vm_extensions: 
   - lb
-  - 10GB_ephemeral_disk
+  - 50GB_ephemeral_disk
   stemcell: trusty
   azs: [z2]
   networks: [{name: private}]
