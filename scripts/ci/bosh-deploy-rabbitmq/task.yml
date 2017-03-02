@@ -12,4 +12,4 @@ inputs:
 - name: stemcell
 
 run:
-  path: scripts/ci/bosh-deploy-rabbitmq/task
+  path: ./penguin-ci/scripts/ci/bosh-deploy-rabbitmq/task
