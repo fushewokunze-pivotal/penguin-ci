@@ -1,0 +1,378 @@
+<%
+director_uuid = 'a2ecb476-19c2-4bac-8e62-92522371850c'
+stemcells_version = '3263.8'
+rabbitmq_server_static_ips = '10.1.1.176'
+rabbitmq_proxy_ip = '10.1.1.177'
+rabbitmq_broker_ip = '10.1.1.178'
+rabbitmq_proxy_vm_type = 'small'
+rabbitmq_server_vm_type = 'large'
+rabbitmq_broker_vm_type = 'small'
+broker_password = 'M6M4j80mdCpH2_m1rk_X1Eudpp4TQnhW'
+rabbitmq_service_broker_password = 'ooPQv0Xtd_-f7jwSmGQfbGxTxTj99wLU'
+cf_metron_agent_shared_secret =  'TN9EBcILWa5dpj0tUCgAt4r1cho_QGJL'
+cf_etcd_machines = '10.1.1.128'
+cf_nats_host = '10.1.1.127'
+cf_nats_password = 'QddGVHm_R6OHncZnJ-rJvQG94s6cJNAJ'
+cf_system_services_password = 'cDJ8NzIn-h9SdYqkP1MAPx9yhAFVbQ00'
+cf_system_domain = 'sys.butterflycluster.com'
+network_name = 'vmnet'
+
+%>
+
+---
+name: p-rabbitmq
+director_uuid: <%= director_uuid %> # {DIRECTOR_UUID}
+releases:
+- name: cf-rabbitmq
+  url: http://10.1.1.57/p-rabbitmq-1.7.5/releases/cf-rabbitmq-222.6.0.tgz
+  sha1: e5dc49bfb1dc1d0239698a2886c1d155fd18eb6b
+  version: 222.6.0
+- name: service-metrics
+  url: http://10.1.1.57/p-rabbitmq-1.7.5/releases/service-metrics-1.4.3.tgz
+  sha1: 6e35ca4656868a628bb4c9c9ebd33e7b8d962835
+  version: 1.4.3
+- name: loggregator
+  url: http://10.1.1.57/p-rabbitmq-1.7.5/releases/loggregator-65.tgz
+  sha1: 3526f5ca58c2101e44d6c0cbb3d490b2196ec58f
+  version: '65'
+- name: rabbitmq-metrics
+  url: http://10.1.1.57/p-rabbitmq-1.7.5/releases/rabbitmq-metrics-1.29.0.tgz
+  sha1: fba3446cb7ee46358b80be9f2df9febe9d8b8300
+  version: 1.29.0
+stemcells:
+- alias: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  os: ubuntu-trusty
+  version: <%= stemcells_version %> # {STEMCELL_VERSION} 
+instance_groups:
+- name: rabbitmq-server
+  azs:
+  - az1
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-server
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-server-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: <%= rabbitmq_server_vm_type  %>
+  stemcell: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: <%= cf_metron_agent_shared_secret %>  # {METRON_SHARED_SECRET}
+    loggregator:
+      etcd:
+        machines:
+        - <%= cf_etcd_machines %> # {ETCD_MACHINE}
+    loggregator_endpoint:
+      shared_secret: <%= cf_metron_agent_shared_secret %> # {METRON_SHARED_SECRET}
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-server-metrics/bin/rabbitmq-server-metrics"
+      metrics_command_args:
+      - "-erlangBinPath=/var/vcap/packages/erlang/bin/"
+      - "-rabbitmqCtlPath=/var/vcap/packages/rabbitmq-server/bin/rabbitmqctl"
+      - "-logPath=/var/vcap/sys/log/service-metrics/rabbitmq-server-metrics.log"
+      - "-rabbitmqUsername=admin"
+      - "-rabbitmqPassword=password"
+      - "-rabbitmqApiEndpoint=http://127.0.0.1:15672"
+    syslog_aggregator:
+      address: 
+      port: 
+    rabbitmq-server:
+      networks:
+        apps: default
+      static_ips:
+      - <%= rabbitmq_server_static_ips %> # {RABBITMQ_SERVER_IP}
+      administrators:
+        management:
+          username: admin
+          password: password
+        broker:
+          username: broker
+          password: <%= broker_password %>
+      plugins:
+      - rabbitmq_management
+      ssl:
+        security_options: 
+        key: 
+        cert: 
+        cacert: 
+        verify: false
+        verification_depth: 5
+        fail_if_no_peer_cert: false
+      config: 
+      cookie: 
+      cluster_partition_handling: pause_minority
+  env:
+    bosh:
+      password: "$6$0c5262373f658468$Wrw4wq08kL8RIrkI1sh6MVmZTqQPd5y2Abe8wjmTYsdYvVjaEHuRcAb1NaPUHqlZaypzPmH2VtQlTD9eqq1p91"
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: <%= network_name %>
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - <%= rabbitmq_server_static_ips %> # {RABBITMQ_SERVER_IP}
+  persistent_disk_type: '10240' # {PERSISTENT_DISK_TYPE}
+
+- name: rabbitmq-haproxy
+  azs:
+  - az1
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-haproxy-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: <%= rabbitmq_proxy_vm_type %>
+  stemcell: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: <%= cf_metron_agent_shared_secret %> # {METRON_SHARED_SECRET}
+    loggregator:
+      etcd:
+        machines:
+        - <%= cf_etcd_machines %> # {ETCD_MACHINE}
+    loggregator_endpoint:
+      shared_secret: <%= cf_metron_agent_shared_secret %> # {METRON_SHARED_SECRET}
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-haproxy-metrics/bin/rabbitmq-haproxy-metrics"
+      metrics_command_args:
+      - "-haproxyNetwork=unix"
+      - "-haproxyAddress=/var/vcap/sys/run/rabbitmq-haproxy/haproxy.sock"
+      - "-logPath=/var/vcap/sys/log/service-metrics/rabbitmq-haproxy-metrics.log"
+    syslog_aggregator:
+      address: 
+      port: 
+    rabbitmq-haproxy:
+      stats:
+        username: admin
+        password: koE2yWjx_x3xb_M83OqjrJOHP3uLS0vE
+      networks:
+        apps: default
+      server_ips:
+      - <%= rabbitmq_server_static_ips %> # {RABBITMQ_SERVER_IP}
+      ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
+  env:
+    bosh:
+      password: "$6$6fa377ea9bd0d915$fkAEtG1r1QW3eVNBjeAgm9EPBeVdl88hsIkyCgAaR9.sJApKzjSaM04zbNbSWrrEwC2ILPQ2gz7ybsJ/Ion7O."
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: <%= network_name %>
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - <%= rabbitmq_proxy_ip %> # {RABBITMQ_PROXY_IP}
+
+- name: rabbitmq-broker
+  azs:
+  - az1
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-broker
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-broker-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: <%= rabbitmq_broker_vm_type %>
+  stemcell: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: <%= cf_metron_agent_shared_secret %> # {METRON_SHARED_SECRET}
+    loggregator:
+      etcd:
+        machines:
+        - <%= cf_etcd_machines %> # {ETCD_MACHINE}
+    loggregator_endpoint:
+      shared_secret: <%= cf_metron_agent_shared_secret %> # {METRON_SHARED_SECRET}
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-broker-metrics/heartbeat.sh"
+      metrics_command_args:
+      - admin
+      - <%= rabbitmq_service_broker_password %>
+    syslog_aggregator:
+      address: 
+      port: 
+    rabbitmq-broker:
+      route: pivotal-rabbitmq-broker
+      ip: <%= rabbitmq_broker_ip %>  # {RABBITMQ_BROKER_IP}
+      networks:
+        apps: default
+      cc_endpoint: https://api.<%= cf_system_domain  %>
+      cc_api_version: v2
+      uaa_endpoint: https://uaa.<%= cf_system_domain  %>
+      uaa_client:
+        client_id: cf
+        username: system_services
+        password: <%= cf_system_services_password %> # {SYSTEM_SERVICES_PASSWORD}
+      rabbitmq:
+        operator_set_policy:
+          enabled: false
+          policy_name: operator_set_policy
+          policy_definition: |
+            {"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode": "automatic"}
+          policy_priority: 50
+        management_domain: pivotal-rabbitmq.<%= cf_system_domain  %>
+        management_ip: <%= rabbitmq_proxy_ip %> # {RABBITMQ_PROXY_IP}
+        hosts:
+        - <%= rabbitmq_proxy_ip %> # {RABBITMQ_PROXY_IP}
+        dns_host: 
+        administrator:
+          username: broker
+          password: M6M4j80mdCpH2_m1rk_X1Eudpp4TQnhW
+        ssl: 
+      service:
+        url: <%= rabbitmq_broker_ip %> # {RABBITMQ_BROKER_IP}
+        username: admin
+        password: <%= rabbitmq_service_broker_password %>
+      logging:
+        level: info
+        print_stack_traces: true
+    cf:
+      domain: <%= cf_system_domain  %>
+      nats:
+        host: <%= cf_nats_host %> # {NATS_SERVER_IP}
+        port: 4222
+        username: nats
+        password: <%= cf_nats_password %> # {NATS_PASSWORD}
+  env:
+    bosh:
+      password: "$6$cebfe074ab906dfa$fOmdPt0xGon2dQpRqhtr1BI4SgY95Uprr.yoDMXFLI2j6lOBlFHSKhCmCRFFjGSE9y0dfHc1duRPY4gqjukY80"
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: <%= network_name %>
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - <%= rabbitmq_broker_ip %> # {RABBITMQ_BROKER_IP}
+- name: broker-registrar
+  azs:
+  - az1
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-registrar
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-rabbitmq
+      host: pivotal-rabbitmq-broker.<%= cf_system_domain  %>
+      username: admin
+      password: <%= rabbitmq_service_broker_password %>
+    cf:
+      api_url: https://api.<%= cf_system_domain  %>
+      admin_username: system_services
+      admin_password: <%= cf_system_services_password %>  # {SYSTEM_SERVICES_PASSWORD}
+      skip_ssl_validation: true
+  env:
+    bosh:
+      password: "$6$6caa32ab99e38c16$bhoyCi.2HZtzlc/IInOvF.mgzCcUETnyvAtJctE4pDhGAbLBEJZ3qeIyRaGzCDBaqxvvSa2kDZTBa.DRgqYj8/"
+  update:
+    max_in_flight: 1
+  networks:
+  - name: <%= network_name %>
+    default:
+    - dns
+    - gateway
+
+- name: broker-deregistrar
+  azs:
+  - az1
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-deregistrar
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-rabbitmq
+      host: pivotal-rabbitmq-broker.<%= cf_system_domain  %>
+      username: admin
+      password: <%= rabbitmq_service_broker_password %> 
+    cf:
+      api_url: https://api.<%= cf_system_domain  %>
+      admin_username: system_services
+      admin_password: <%= cf_system_services_password %> # {SYSTEM_SERVICES_PASSWORD}
+      skip_ssl_validation: true
+  env:
+    bosh:
+      password: "$6$ae44627f1d86d942$3HjEndfBb0c84H8XsF3dcx9DiYcpNCPD.Tp3UJaZRUAPq2wIvxdUmm4yuny8Sf/RWCs2zGtGahNNV.sSJvZSS0"
+  update:
+    max_in_flight: 1
+  networks:
+  - name: <%= network_name %>
+    default:
+    - dns
+    - gateway
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 1
+  max_errors: 2
+  serial: true

@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: relintdockerhubpushbot/bosh-cli
+
+inputs:
+- name: bbl-state
+- name: runtime-ci
+- name: stemcell
+
+run:
+path: penguin-ci/scripts/ci/bosh-deploy-rabbitmq/task

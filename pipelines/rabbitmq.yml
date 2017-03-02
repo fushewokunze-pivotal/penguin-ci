@@ -1,0 +1,40 @@
+---
+resources:
+# Stemcell
+- name: stemcell
+  type: bosh-io-stemcell
+  source:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+
+# ENV
+- name: penguin-env-director-state
+  type: git
+  source:
+    branch: master
+    uri: git@github.com:fushewokunze-pivotal/penguin-env.git 
+    private_key: {{penguin_env_private_key}} 
+    paths:
+    - bbl-state.json
+
+- name: runtime-ci
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/runtime-ci.git
+
+jobs:
+- name: deploy-rabbitmq-standalone
+  public: true
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: stemcell
+      trigger: true
+    - get: penguin-env-director-state
+      trigger: true
+    - get: runtime-ci
+  - task: deploy-rabbitmq
+    file: penguin-ci/scripts/ci/bosh-deploy-rabbitmq/task.yml
+    input_mapping:
+      bbl-state: penguin-env-director-state
+

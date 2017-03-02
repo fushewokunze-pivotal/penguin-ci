@@ -2,9 +2,9 @@ name: concourse
 director_uuid: 0dd15f21-a960-4418-be73-fa7c2465c77b
 releases:
 - name: concourse
-  version: 2.6.0
-  url: https://bosh.io/d/github.com/concourse/concourse?v=2.6.0
-  sha1: 6e4c1321768df37a0e3947f59d28ddf8804bd4c0
+  version: 2.7.0
+  url: https://bosh.io/d/github.com/concourse/concourse?v=2.7.0
+  sha1: 826932f631d0941b3e4cc9cb19e0017c7f989b56
 - name: garden-runc
   version: 0.8.0
   url: https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=0.8.0
@@ -17,6 +17,7 @@ instance_groups:
 - name: web
   instances: 1
   vm_type: t2.small
+  persistent_disk_type: 10GB
   vm_extensions: 
   - lb
   stemcell: trusty
@@ -28,7 +29,7 @@ instance_groups:
     properties:
       basic_auth_password: password
       basic_auth_username: admin
-      external_url: http://[REPLACE_ME]
+      external_url: http://52.8.105.10
       postgresql_database: atc
   - name: tsa
     release: concourse
@@ -56,6 +57,7 @@ instance_groups:
   vm_type: m3.medium
   vm_extensions: 
   - lb
+  - 10GB_ephemeral_disk
   stemcell: trusty
   azs: [z2]
   networks: [{name: private}]
@@ -70,6 +72,7 @@ instance_groups:
     release: garden-runc
     properties:
       garden:
+        btrfs_store_size_mb: 100000
         allow_host_access: true
         listen_address: 0.0.0.0:7777
         listen_network: tcp
