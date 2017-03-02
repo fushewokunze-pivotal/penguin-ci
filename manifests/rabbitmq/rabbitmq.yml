@@ -3,7 +3,7 @@
 name: p-rabbitmq
 releases:
 - name: cf-rabbitmq
-  url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.5/cf-rabbitmq-222.6.0.tgz
+  url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.5/cf-rabbitmq-222.6.0.tgz 
   sha1: e5dc49bfb1dc1d0239698a2886c1d155fd18eb6b
   version: 222.6.0
 - name: service-metrics
