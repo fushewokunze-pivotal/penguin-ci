@@ -1,0 +1,6 @@
+---
+- type: remove
+  path: /instance_groups/name=consul/azs/z3
+
+- type: remove
+  path: /instance_groups/name=etcd/azs/z3  
