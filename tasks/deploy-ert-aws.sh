@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e 
+set -e
 
 eval "$(pcf-bosh-ci/scripts/director-environment bosh-vars-store/*-bosh-vars-store.yml terraform-state/metadata)"
 
@@ -25,7 +25,6 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --ops-file p-ert/aws/ip-overrides.yml \
   --ops-file p-ert/s3.yml \
   --ops-file p-ert/external-mysql.yml \
-  --ops-file penguin-ci/ops-files/remove-aws-az3.yml \
   --vars-store new-cf-vars-store/cf-vars-store.yml \
   --var "cc_s3_access_key=$(jq -r .ert_iam_user_access_key terraform-state/metadata)" \
   --var "cc_s3_secret_key=$(jq -r .ert_iam_user_secret_access_key terraform-state/metadata)" \
@@ -41,16 +40,16 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --var "external_mysql_username=$(jq -r .rds_username terraform-state/metadata)" \
   --var "external_mysql_password=$(jq -r .rds_password terraform-state/metadata)" \
   --var "cf_release_path=file://$(ls "$PWD"/closed-source-releases/cf-246*.tgz)" \
-  --var "cf_release_version=246.0.9" \
+  --var "cf_release_version=246.0.2" \
   --var "notifications_release_path=file://$(ls "$PWD"/closed-source-releases/notifications-31*.tgz)" \
   --var "notifications_release_version=31" \
   --var "notifications_ui_release_path=file://$(ls "$PWD"/closed-source-releases/notifications-ui*.tgz)" \
   --var "notifications_ui_release_version=26" \
   --var "cf_autoscaling_release_path=file://$(ls "$PWD"/closed-source-releases/cf-autoscaling*.tgz)" \
-  --var "cf_autoscaling_release_version=75.3" \
+  --var "cf_autoscaling_release_version=67" \
   --var "push_apps_manager_release_path=file://$(ls "$PWD"/closed-source-releases/push-apps-manager*.tgz)" \
-  --var "push_apps_manager_release_version=659.10" \
+  --var "push_apps_manager_release_version=659.7" \
   --var "mysql_monitoring_release_path=file://$(ls "$PWD"/closed-source-releases/mysql-monitoring*.tgz)" \
   --var "mysql_monitoring_release_version=6" \
   --var "pivotal_account_release_path=file://$(ls "$PWD"/closed-source-releases/pivotal-account*.tgz)" \
-  --var "pivotal_account_release_version=1.1.10"
+  --var "pivotal_account_release_version=1"
