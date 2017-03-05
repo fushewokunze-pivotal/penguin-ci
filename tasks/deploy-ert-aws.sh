@@ -9,7 +9,6 @@ cp cf-vars-store/*-cf-vars-store.yml new-cf-vars-store/cf-vars-store.yml
 bosh -n deploy cf-deployment/cf-deployment.yml \
   --deployment cf \
   --ops-file cf-deployment/opsfiles/change-logging-port-for-aws-elb.yml \
-  --ops-file cf-deployment/opsfiles/static-ips.yml \
   --ops-file p-ert/pivotal-defaults.yml \
   --ops-file p-ert/mysql-proxy.yml \
   --ops-file p-ert/mysql-monitoring.yml \
