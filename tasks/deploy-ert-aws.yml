@@ -25,4 +25,4 @@ params:
   SMTP_SENDER_PASSWORD:
 
 run:
-  path: pcf-bosh-ci/tasks/deploy-ert-aws.sh
+  path: penguin-ci/tasks/deploy-ert-aws.sh
