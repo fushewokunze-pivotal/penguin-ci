@@ -1,0 +1,346 @@
+---
+name: p-rabbitmq
+director_uuid: ignore
+releases:
+- name: cf-rabbitmq
+  version: 222.11.0
+- name: service-metrics
+  version: 1.5.2
+- name: loggregator
+  version: '65'
+- name: rabbitmq-metrics
+  version: 1.49.0
+stemcells:
+- alias: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+  os: ubuntu-trusty
+  version: latest
+instance_groups:
+- name: rabbitmq-server
+  azs:
+  - z1
+  instances: 2
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-server
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-server-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: large
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: ((dropsonde_shared_secret))
+    loggregator:
+      etcd:
+        machines:
+        - ((loggregator_etcd_machines))
+    loggregator_endpoint:
+      shared_secret: ((dropsonde_shared_secret))
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-server-metrics/bin/rabbitmq-server-metrics"
+      metrics_command_args:
+      - "-erlangBinPath=/var/vcap/packages/erlang/bin/"
+      - "-rabbitmqCtlPath=/var/vcap/packages/rabbitmq-server/bin/rabbitmqctl"
+      - "-logPath=/var/vcap/sys/log/service-metrics/rabbitmq-server-metrics.log"
+      - "-rabbitmqUsername=admin"
+      - "-rabbitmqPassword=password"
+      - "-rabbitmqApiEndpoint=http://127.0.0.1:15672"
+    syslog_aggregator:
+      address: 
+      port: 
+    rabbitmq-server:
+      networks:
+        apps: default
+      static_ips:
+      - ((server_ip_1))
+      - 10.1.1.160
+      administrators:
+        management:
+          username: admin
+          password: password
+        broker:
+          username: broker
+          password: ((broker_password))
+      plugins:
+      - rabbitmq_management
+      ssl:
+        security_options: 
+        key: 
+        cert: 
+        cacert: 
+        verify: false
+        verification_depth: 5
+        fail_if_no_peer_cert: false
+      config: 
+      cookie: 
+      cluster_partition_handling: pause_minority
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - ((server_ip_1))
+    - 10.1.1.160
+  migrated_from:
+  - name: rabbitmq-server-partition-bbf10fe2740530f93da3
+    az: z1
+  persistent_disk_type: '10240'
+- name: rabbitmq-haproxy
+  azs:
+  - z1
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-haproxy
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-haproxy-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: small
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: ((dropsonde_shared_secret))
+    loggregator:
+      etcd:
+        machines:
+        - ((loggregator_etcd_machines))
+    loggregator_endpoint:
+      shared_secret: ((dropsonde_shared_secret))
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-haproxy-metrics/bin/rabbitmq-haproxy-metrics"
+      metrics_command_args:
+      - "-haproxyNetwork=unix"
+      - "-haproxyAddress=/var/vcap/sys/run/rabbitmq-haproxy/haproxy.sock"
+      - "-logPath=/var/vcap/sys/log/service-metrics/rabbitmq-haproxy-metrics.log"
+    syslog_aggregator:
+      address: 
+      port: 
+    rabbitmq-haproxy:
+      stats:
+        username: admin
+        password: ((proxy_stats_password))
+      networks:
+        apps: default
+      server_ips:
+      - ((server_ip_1))
+      - ((server_ip_2))
+      ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - 10.1.1.161
+  migrated_from:
+  - name: rabbitmq-haproxy-partition-bbf10fe2740530f93da3
+    az: z1
+- name: rabbitmq-broker
+  azs:
+  - z1
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: rabbitmq-broker
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: rabbitmq-broker-metrics
+    release: rabbitmq-metrics
+    consumes: {}
+    provides: {}
+  vm_type: small
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    metron_agent:
+      deployment: cf-rabbitmq
+    metron_endpoint:
+      shared_secret: ((dropsonde_shared_secret))
+    loggregator:
+      etcd:
+        machines:
+        - ((loggregator_etcd_machines))
+    loggregator_endpoint:
+      shared_secret: ((dropsonde_shared_secret))
+    service_metrics:
+      execution_interval_seconds: 30
+      origin: p-rabbitmq
+      metrics_command: "/var/vcap/packages/rabbitmq-broker-metrics/heartbeat.sh"
+      metrics_command_args:
+      - admin
+      - ((rabbitmq_admin_password))
+    syslog_aggregator:
+      address: 
+      port: 
+    rabbitmq-broker:
+      route: pivotal-rabbitmq-broker
+      ip: ((broker_ip))
+      networks:
+        apps: default
+      cc_endpoint: https://api.((system_domain))
+      cc_api_version: v2
+      uaa_endpoint: https://uaa.((system_domain))
+      uaa_client:
+        client_id: cf
+        username: admin
+        password: ((cf_admin_password))
+      rabbitmq:
+        operator_set_policy:
+          enabled: false
+          policy_name: operator_set_policy
+          policy_definition: |
+            {"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode": "automatic"}
+          policy_priority: 50
+        management_domain: pivotal-rabbitmq.((system_domain))
+        management_ip: ((management_ip))
+        hosts:
+        - ((management_ip))
+        dns_host: 
+        administrator:
+          username: broker
+          password: ((broker_password))
+        ssl: 
+      service:
+        url: ((broker_ip))
+        username: admin
+        password: ((rabbitmq_admin_password))
+      logging:
+        level: info
+        print_stack_traces: true
+    cf:
+      domain: ((system_domain))
+      nats:
+        host: ((nats_host))
+        port: 4222
+        username: nats
+        password: ((nats_password))
+  env:
+    bosh:
+      password: "$6$52eb24661beb04e3$5cAORT1Jz/6Ycgxt8kmWDwdSU2M4HAZyzMuIIJgqVsaKY48XbgqUn4AfpLhh1uCdt4o9Bl2AgcZOfVljnUkOj0"
+  update:
+    serial: false
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - ((broker_ip))
+  migrated_from:
+  - name: rabbitmq-broker-partition-bbf10fe2740530f93da3
+    az: z1
+- name: broker-registrar
+  azs:
+  - z1
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-registrar
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-rabbitmq
+      host: pivotal-rabbitmq-broker.((system_domain))
+      username: admin
+      password: ((rabbitmq_admin_password))
+    cf:
+      api_url: https://api.((system_domain))
+      admin_username: admin
+      admin_password: ((cf_admin_password))
+      skip_ssl_validation: false
+  update:
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+- name: broker-deregistrar
+  azs:
+  - z1
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-deregistrar
+    release: cf-rabbitmq
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-rabbitmq
+      host: pivotal-rabbitmq-broker.((system_domain))
+      username: admin
+      password: ((rabbitmq_admin_password))
+    cf:
+      api_url: https://api.((system_domain))
+      admin_username: admin
+      admin_password: ((cf_admin_password))
+      skip_ssl_validation: false
+  update:
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 1
+  max_errors: 2
+  serial: true
