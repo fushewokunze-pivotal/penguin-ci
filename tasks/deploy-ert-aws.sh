@@ -9,6 +9,7 @@ cp cf-vars-store/*-cf-vars-store.yml new-cf-vars-store/cf-vars-store.yml
 bosh -n deploy cf-deployment/cf-deployment.yml \
   --deployment cf \
   --ops-file cf-deployment/opsfiles/change-logging-port-for-aws-elb.yml \
+  --ops-file cf-deployment/opsfiles/tcp-routing-gcp.yml \
   --ops-file p-ert/pivotal-defaults.yml \
   --ops-file p-ert/mysql-proxy.yml \
   --ops-file p-ert/mysql-monitoring.yml \
@@ -25,7 +26,6 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --ops-file p-ert/aws/ip-overrides.yml \
   --ops-file p-ert/s3.yml \
   --ops-file p-ert/external-mysql.yml \
-  --ops-file penguin-ci/ops-files/remove-aws-az3.yml \
   --vars-store new-cf-vars-store/cf-vars-store.yml \
   --var "cc_s3_access_key=$(jq -r .ert_iam_user_access_key terraform-state/metadata)" \
   --var "cc_s3_secret_key=$(jq -r .ert_iam_user_secret_access_key terraform-state/metadata)" \
