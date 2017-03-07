@@ -54,3 +54,5 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --var "mysql_monitoring_release_version=6" \
   --var "pivotal_account_release_path=file://$(ls "$PWD"/closed-source-releases/pivotal-account*.tgz)" \
   --var "pivotal_account_release_version=1"
+  
+  
