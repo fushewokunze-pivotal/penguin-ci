@@ -67,6 +67,7 @@ variables:
     alternative_names: 
     - ((external_ip))
     - ((internal_ip))
+    - ((bosh_director_domain))
     - 127.0.0.1
 - name: uaa-jwt
   type: rsa 
