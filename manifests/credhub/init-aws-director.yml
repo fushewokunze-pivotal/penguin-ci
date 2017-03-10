@@ -324,7 +324,7 @@ jobs:
           secret_access_key: ((secret_access_key))
           default_key_name: ((default_key_name))
           default_security_groups:
-          - ((default_security_groups))
+          #- ((default_security_groups))
           - ((bosh_director_security_groups))
           region: ((region))
         ntp: &ntp
