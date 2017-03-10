@@ -16,9 +16,13 @@ releases:
 - name: credhub
   url: https://github.com/pivotal-cf/credhub-release/releases/download/0.5.1/credhub-0.5.1.tgz
   sha1: fcfa37835c813b175defe01d8fae7d57e7ef669c
-- name: bosh-aws-cpi
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=56
-  sha1: 2b85e1bdc31f41a26b454f4731bf2d1df2ea17de
+#- name: bosh-aws-cpi
+#  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=56
+#  sha1: 2b85e1bdc31f41a26b454f4731bf2d1df2ea17de
+- name: bosh-aws-cpi    
+  version: 60
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=60
+  sha1: 8e40a9ff892204007889037f094a1b0d23777058
 
 resource_pools:
 - name: vms
