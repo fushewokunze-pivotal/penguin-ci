@@ -68,7 +68,7 @@ variables:
     - ((bosh_director_domain))
     - ((internal_ip))
     - ((external_ip))
-
+    - 127.0.0.1
 - name: uaa_jwt_signing_key
   type: rsa 
 - name: postgres-admin
