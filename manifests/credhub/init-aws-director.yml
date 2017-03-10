@@ -54,22 +54,22 @@ networks:
       subnet: ((subnet_id))
 
 variables:
-- name: tls-ca
+- name: default_ca
   type: certificate
-  options: 
-    common_name: 'BOSH Director CA'
+  options:
     is_ca: true
-- name: tls
+    common_name: ca # todo fix
+- name: director_ssl
   type: certificate
-  options: 
-    ca: tls-ca
-    common_name: ((external_ip))
-    alternative_names: 
-    - ((external_ip))
-    - ((internal_ip))
+  options:
+    ca: default_ca
+    common_name: ((internal_ip))
+    alternative_names: #[((internal_ip))]
     - ((bosh_director_domain))
-    - 127.0.0.1
-- name: uaa-jwt
+    - ((internal_ip))
+    - ((external_ip))
+
+- name: uaa_jwt_signing_key
   type: rsa 
 - name: postgres-admin
   type: password
@@ -77,7 +77,7 @@ variables:
   type: password
 - name: uaa-users-hm
   type: password
-- name: uaa-clients-director-to-credhub
+- name: uaa_clients_director_to_credhub
   type: password
 - name: uaa-admin
   type: password
@@ -92,6 +92,8 @@ variables:
 - name: blobstore-director
   type: password
 - name: mbus
+  type: password
+- name: ci_secret
   type: password
 
 jobs:
@@ -118,8 +120,8 @@ jobs:
           port: 8844
           authentication:
             uaa:
-              url: *uaa-url
-              verification_key: ((uaa-jwt.public_key))
+              url: https://((bosh_director_domain)):8443
+              verification_key: ((uaa_jwt_signing_key.public_key))
           data_storage:
             type: postgres
             host: 127.0.0.1
@@ -128,8 +130,8 @@ jobs:
             password: ((postgres-admin))
             database: credhub
           tls:
-            certificate: ((tls.certificate))
-            private_key: ((tls.private_key))
+            certificate: ((director_ssl.certificate))
+            private_key: ((director_ssl.private_key))
           log_level: info
           encryption:
             keys:
@@ -157,7 +159,7 @@ jobs:
       release: uaa
       properties:
         uaa:
-          url: &uaa-url "https://((external_ip)):8443"
+          url: "https://((bosh_director_domain)):8443"
           scim:
             users:
             - name: admin
@@ -195,19 +197,25 @@ jobs:
               scope: uaa.none
               authorities: credhub.read,credhub.write
               access-token-validity: 43200
-              secret: ((uaa-clients-director-to-credhub))
+              secret: ((uaa_clients_director_to_credhub))
+            ci:
+              override: true
+              authorized-grant-types: client_credentials
+              scope: ""
+              authorities: bosh.admin
+              secret: ((ci_secret))   
           admin: {client_secret: ((uaa-admin))}
           login: {client_secret: ((uaa-login))}
           zones: {internal: {hostnames: []}}
-          sslCertificate: ((tls.certificate))
-          sslPrivateKey: ((tls.private_key))
+          sslCertificate: ((director_ssl.certificate))
+          sslPrivateKey: ((director_ssl.private_key))
           jwt:
             revocable: true
             policy:
               active_key_id: key-1
               keys:
                 key-1:
-                  signingKey: ((uaa-jwt.private_key))
+                  signingKey: ((uaa_jwt_signing_key.private_key))
   
         uaadb:
           address: 127.0.0.1
@@ -223,8 +231,8 @@ jobs:
 
         login:
           saml:
-            serviceProviderCertificate: ((tls.certificate))
-            serviceProviderKey: ((tls.private_key))
+            serviceProviderCertificate: ((director_ssl.certificate))
+            serviceProviderKey: ((director_ssl.private_key))
             serviceProviderKeyPassword: ""
 
     - name: director
@@ -236,12 +244,12 @@ jobs:
           config_server:
             enabled: true
             url: "https://127.0.0.1:8844/api/"
-            ca_cert: ((tls.ca))
+            ca_cert: ((director_ssl.ca))
             uaa:
-              url: *uaa-url
+              url: "https://((bosh_director_domain)):8443"
               client_id: director_to_credhub
-              client_secret: ((uaa-clients-director-to-credhub))
-              ca_cert: ((tls.ca))
+              client_secret: ((uaa_clients_director_to_credhub))
+              ca_cert: ((director_ssl.ca))
           db: *db
           cpi_job: aws_cpi
           max_threads: 10
@@ -249,12 +257,12 @@ jobs:
           user_management:
             provider: uaa
             uaa:
-              url: *uaa-url
-              public_key: ((uaa-jwt.public_key))
+              url: "https://((bosh_director_domain)):8443"
+              public_key: ((uaa_jwt_signing_key.public_key))
           ssl:
-            cert: ((tls.certificate))
-            key: ((tls.private_key))
-          trusted_certs: ((tls.ca))
+            cert: ((director_ssl.certificate))
+            key: ((director_ssl.private_key))
+          trusted_certs: ((director_ssl.ca))
         agent: &agent
           mbus: nats://nats:((nats))@((internal_ip)):4222
           ntp: *ntp
@@ -316,7 +324,7 @@ jobs:
           director_account:
             user: hm
             password: ((uaa-users-hm))
-            ca_cert: ((tls.ca))
+            ca_cert: ((director_ssl.ca))
           resurrector_enabled: true
         director: *director
         nats: *nats
