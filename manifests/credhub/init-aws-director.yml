@@ -129,7 +129,8 @@ jobs:
           encryption:
             keys:
             - provider_name: internal
-              dev_key: ((credhub-encryption-key))
+              #dev_key: ((credhub-encryption-key))
+              dev_key: 7DBBD8098CAC7EDC342AE3EA46AD00D7
               active: true
             providers:
             - name: internal
@@ -342,7 +343,8 @@ cloud_provider:
   ssh_tunnel:
     host: ((external_ip))
     port: 22
-    user: ((ssh-username))
+    #user: ((ssh-username))
+    user: admin
     private_key: ((private_key))
 
   mbus: https://mbus:((mbus))@((external_ip)):6868
