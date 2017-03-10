@@ -349,7 +349,7 @@ cloud_provider:
     host: ((external_ip))
     port: 22
     #user: ((ssh-username))
-    user: admin
+    user: vcap
     private_key: ((private_key))
 
   mbus: https://mbus:((mbus))@((external_ip)):6868
