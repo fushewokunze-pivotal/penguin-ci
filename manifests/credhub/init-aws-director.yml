@@ -33,8 +33,7 @@ resource_pools:
   cloud_properties:
     instance_type: m3.xlarge
     ephemeral_disk: {size: 25000, type: gp2}
-    #availability_zone: ((az))
-    availability_zone: us-west-1a
+    availability_zone: ((az))
 
 disk_pools:
 - name: disks
@@ -330,7 +329,8 @@ jobs:
           default_key_name: ((default_key_name))
           default_security_groups:
           #- ((default_security_groups))
-          - ((bosh_director_security_groups))
+          #- ((bosh_director_security_groups))
+          - bosh_security_group
           region: ((region))
         ntp: &ntp
         - 0.pool.ntp.org
