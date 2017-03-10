@@ -328,9 +328,9 @@ jobs:
           secret_access_key: ((secret_access_key))
           default_key_name: ((default_key_name))
           default_security_groups:
-          #- ((default_security_groups))
+          - ((default_security_groups))
           #- ((bosh_director_security_groups))
-          - bosh_security_group
+          #- bosh_security_group
           region: ((region))
         ntp: &ntp
         - 0.pool.ntp.org
