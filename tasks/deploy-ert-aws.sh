@@ -21,7 +21,6 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --ops-file p-ert/errands/push-pivotal-account.yml \
   --ops-file p-ert/errands/mysql-recovery/bootstrap.yml \
   --ops-file p-ert/errands/mysql-recovery/rejoin-unsafe.yml \
-  --ops-file p-ert/aws/ip-overrides.yml \
   --ops-file p-ert/s3.yml \
   --ops-file p-ert/external-mysql.yml \
   --vars-store new-cf-vars-store/cf-vars-store.yml \
