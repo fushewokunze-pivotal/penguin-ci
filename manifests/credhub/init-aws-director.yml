@@ -243,7 +243,8 @@ jobs:
           name: *name
           config_server:
             enabled: true
-            url: "https://127.0.0.1:8844/api/"
+            #url: "https://127.0.0.1:8844/api/"
+            url: "https://((bosh_director_domain)):8844/api/"
             ca_cert: ((director_ssl.ca))
             uaa:
               url: "https://((bosh_director_domain)):8443"
