@@ -4,7 +4,7 @@ set -e
 
 eval "$(pcf-bosh-ci/scripts/director-environment bosh-vars-store/*-bosh-vars-store.yml terraform-state/metadata)"
 
-cp cf-vars-store/*-cf-vars-store.yml new-cf-vars-store/cf-vars-store.yml
+#cp cf-vars-store/*-cf-vars-store.yml new-cf-vars-store/cf-vars-store.yml
 
 bosh -n deploy cf-deployment/cf-deployment.yml \
   --deployment cf \
