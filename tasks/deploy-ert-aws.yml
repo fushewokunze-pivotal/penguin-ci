@@ -10,13 +10,13 @@ inputs:
 - name: bosh-vars-store
 - name: cf-deployment
 - name: p-ert
-- name: cf-vars-store
+#- name: cf-vars-store
 - name: closed-source-releases
 - name: terraform-state
 - name: penguin-ci
 
-outputs:
-- name: new-cf-vars-store
+#outputs:
+#- name: new-cf-vars-store
 
 params:
   SMTP_HOST_NAME:
