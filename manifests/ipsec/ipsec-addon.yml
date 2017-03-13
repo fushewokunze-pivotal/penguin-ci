@@ -1,0 +1,24 @@
+releases:
+- {name: ipsec, version: 1.5.37}
+
+addons:
+- name: ipsec-addon
+  jobs:
+  - name: ipsec
+    release: ipsec
+  properties:
+    ipsec:
+      ipsec_subnets:
+      - 10.0.4.1/24
+      - 10.0.5.1/24
+      - 10.0.6.1/24
+      no_ipsec_subnets:
+      - 10.0.0.4/32  # bosh director
+      instance_certificate: "((ipsec.certificate))"
+      instance_private_key: "((ipsec.private_key))"
+      ca_certificates:
+        - "((ipsec.ca))"
+      prestart_timeout: 30
+      esp_proposals: aes128gcm16!
+      ike_proposals: aes128-sha256-modp2048! 
+
