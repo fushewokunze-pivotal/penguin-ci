@@ -1,6 +1,5 @@
 ---
 name: p-rabbitmq
-director_uuid: ignore
 releases:
 - name: cf-rabbitmq
   version: 222.11.0
@@ -11,9 +10,9 @@ releases:
 - name: rabbitmq-metrics
   version: 1.49.0
 stemcells:
-- alias: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+- alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   os: ubuntu-trusty
-  version: latest
+  version: '3263.17'
 instance_groups:
 - name: rabbitmq-server
   azs:
@@ -37,19 +36,19 @@ instance_groups:
     release: rabbitmq-metrics
     consumes: {}
     provides: {}
-  vm_type: large
+  vm_type: m3.large
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     metron_agent:
       deployment: cf-rabbitmq
     metron_endpoint:
-      shared_secret: ((dropsonde_shared_secret))
+      shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     loggregator:
       etcd:
         machines:
-        - ((loggregator_etcd_machines))
+        - 10.0.4.16
     loggregator_endpoint:
-      shared_secret: ((dropsonde_shared_secret))
+      shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
       execution_interval_seconds: 30
       origin: p-rabbitmq
@@ -66,10 +65,10 @@ instance_groups:
       port: 
     rabbitmq-server:
       networks:
-        apps: default
+        apps: private
       static_ips:
-      - ((server_ip_1))
-      - 10.1.1.160
+      - 10.0.4.27
+      - 10.0.5.15
       administrators:
         management:
           username: admin
@@ -90,6 +89,7 @@ instance_groups:
       config: 
       cookie: 
       cluster_partition_handling: pause_minority
+
   update:
     serial: false
     max_in_flight: 1
@@ -99,12 +99,12 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - ((server_ip_1))
-    - 10.1.1.160
+    - 10.0.4.27
+    - 10.0.5.15
   migrated_from:
-  - name: rabbitmq-server-partition-bbf10fe2740530f93da3
+  - name: rabbitmq-server
     az: z1
-  persistent_disk_type: '10240'
+  persistent_disk_type: '10GB_ephemeral_disk'
 - name: rabbitmq-haproxy
   azs:
   - z1
@@ -127,19 +127,19 @@ instance_groups:
     release: rabbitmq-metrics
     consumes: {}
     provides: {}
-  vm_type: small
+  vm_type: t2.small
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     metron_agent:
       deployment: cf-rabbitmq
     metron_endpoint:
-      shared_secret: ((dropsonde_shared_secret))
+      shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     loggregator:
       etcd:
         machines:
-        - ((loggregator_etcd_machines))
+        - 10.0.4.16
     loggregator_endpoint:
-      shared_secret: ((dropsonde_shared_secret))
+      shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
       execution_interval_seconds: 30
       origin: p-rabbitmq
@@ -156,11 +156,12 @@ instance_groups:
         username: admin
         password: ((proxy_stats_password))
       networks:
-        apps: default
+        apps: private
       server_ips:
-      - ((server_ip_1))
-      - ((server_ip_2))
+      - 10.0.4.27
+      - 10.0.5.15
       ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
+
   update:
     serial: false
     max_in_flight: 1
@@ -170,9 +171,9 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.1.1.161
+    - 10.0.5.19
   migrated_from:
-  - name: rabbitmq-haproxy-partition-bbf10fe2740530f93da3
+  - name: rabbitmq-haproxy
     az: z1
 - name: rabbitmq-broker
   azs:
@@ -196,19 +197,19 @@ instance_groups:
     release: rabbitmq-metrics
     consumes: {}
     provides: {}
-  vm_type: small
+  vm_type: t2.small
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     metron_agent:
       deployment: cf-rabbitmq
     metron_endpoint:
-      shared_secret: ((dropsonde_shared_secret))
+      shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     loggregator:
       etcd:
         machines:
-        - ((loggregator_etcd_machines))
+        - 10.0.4.16
     loggregator_endpoint:
-      shared_secret: ((dropsonde_shared_secret))
+      shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
       execution_interval_seconds: 30
       origin: p-rabbitmq
@@ -221,16 +222,16 @@ instance_groups:
       port: 
     rabbitmq-broker:
       route: pivotal-rabbitmq-broker
-      ip: ((broker_ip))
+      ip: 10.0.5.18
       networks:
-        apps: default
+        apps: private
       cc_endpoint: https://api.((system_domain))
       cc_api_version: v2
       uaa_endpoint: https://uaa.((system_domain))
       uaa_client:
         client_id: cf
-        username: admin
-        password: ((cf_admin_password))
+        username: push_apps_manager
+        password: ((/aws-director-credhub/cf/push_apps_manager_password))
       rabbitmq:
         operator_set_policy:
           enabled: false
@@ -239,16 +240,16 @@ instance_groups:
             {"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode": "automatic"}
           policy_priority: 50
         management_domain: pivotal-rabbitmq.((system_domain))
-        management_ip: ((management_ip))
+        management_ip: 10.0.5.19
         hosts:
-        - ((management_ip))
+        - 10.0.5.19
         dns_host: 
         administrator:
           username: broker
           password: ((broker_password))
         ssl: 
       service:
-        url: ((broker_ip))
+        url: 10.0.5.18
         username: admin
         password: ((rabbitmq_admin_password))
       logging:
@@ -257,13 +258,11 @@ instance_groups:
     cf:
       domain: ((system_domain))
       nats:
-        host: ((nats_host))
+        host: ((nats_ips))
         port: 4222
         username: nats
-        password: ((nats_password))
-  env:
-    bosh:
-      password: "$6$52eb24661beb04e3$5cAORT1Jz/6Ycgxt8kmWDwdSU2M4HAZyzMuIIJgqVsaKY48XbgqUn4AfpLhh1uCdt4o9Bl2AgcZOfVljnUkOj0"
+        password: ((/aws-director-credhub/cf/nats_password))
+
   update:
     serial: false
     max_in_flight: 1
@@ -273,9 +272,9 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - ((broker_ip))
+    - 10.0.5.18
   migrated_from:
-  - name: rabbitmq-broker-partition-bbf10fe2740530f93da3
+  - name: rabbitmq-broker
     az: z1
 - name: broker-registrar
   azs:
@@ -287,7 +286,7 @@ instance_groups:
     release: cf-rabbitmq
     consumes: {}
     provides: {}
-  vm_type: micro
+  vm_type: t2.small
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     broker:
@@ -297,9 +296,10 @@ instance_groups:
       password: ((rabbitmq_admin_password))
     cf:
       api_url: https://api.((system_domain))
-      admin_username: admin
-      admin_password: ((cf_admin_password))
+      admin_username: push_apps_manager
+      admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       skip_ssl_validation: false
+  
   update:
     max_in_flight: 1
   networks:
@@ -317,7 +317,7 @@ instance_groups:
     release: cf-rabbitmq
     consumes: {}
     provides: {}
-  vm_type: micro
+  vm_type: t2.small
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     broker:
@@ -327,9 +327,10 @@ instance_groups:
       password: ((rabbitmq_admin_password))
     cf:
       api_url: https://api.((system_domain))
-      admin_username: admin
-      admin_password: ((cf_admin_password))
+      admin_username: push_apps_manager
+      admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       skip_ssl_validation: false
+  
   update:
     max_in_flight: 1
   networks:
@@ -344,3 +345,11 @@ update:
   max_in_flight: 1
   max_errors: 2
   serial: true
+
+variables:
+- name: broker_password
+  type: password
+- name: proxy_stats_password
+  type: password
+- name: rabbitmq_admin_password
+  type: password
