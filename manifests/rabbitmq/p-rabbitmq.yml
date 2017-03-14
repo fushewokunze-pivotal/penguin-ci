@@ -16,7 +16,7 @@ releases:
 - name: rabbitmq-metrics
   url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/rabbitmq-metrics-1.54.0-dev.2.tgz
   sha1: b0c7d729fab13e292d50afeab40d4d178d8f8a43
-  version: '1.54.0'
+  version: '1.54.0-dev.2'
 
 stemcells:
 - alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
