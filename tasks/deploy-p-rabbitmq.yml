@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: { repository: pcfbosh/minimal }
+
+inputs:
+- name: pcf-bosh-ci
+- name: penguin-ci
+- name: bosh-vars-store 
+- name: terraform-state
+
+run:
+  path: penguin-ci/tasks/deploy-p-rabbitmq.sh
