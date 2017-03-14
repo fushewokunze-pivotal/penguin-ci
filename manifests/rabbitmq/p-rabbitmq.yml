@@ -113,9 +113,7 @@ instance_groups:
     static_ips:
     - 10.0.4.193
     - 10.0.5.192
-  migrated_from:
-  - name: rabbitmq-server
-    az: z1
+
 - name: rabbitmq-haproxy
   azs:
   - z2
@@ -183,9 +181,7 @@ instance_groups:
     - gateway
     static_ips:
     - 10.0.5.193
-  migrated_from:
-  - name: rabbitmq-haproxy
-    az: z1
+
 - name: rabbitmq-broker
   azs:
   - z1
@@ -284,9 +280,7 @@ instance_groups:
     - gateway
     static_ips:
     - 10.0.5.194
-  migrated_from:
-  - name: rabbitmq-broker
-    az: z1
+
 - name: broker-registrar
   azs:
   - z1
