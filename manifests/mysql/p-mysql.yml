@@ -491,3 +491,17 @@ update:
   max_in_flight: 1
   max_errors: 2
   serial: true
+
+variables:
+- name: cf_mysql_admin_password
+  type: password
+- name: cf_mysql_seeded_databases_password
+  type: password
+- name: cf_mysql_cluster_health_password
+  type: password
+- name: cf_mysql_galera_healthcheck_endpoint_username
+  type: password
+- name: cf_mysql_galera_healthcheck_endpoint_password
+  type: password
+- name: cf_mysql_galera_healthcheck_db_password
+  type: password  
