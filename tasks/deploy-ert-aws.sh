@@ -23,7 +23,6 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --ops-file p-ert/errands/mysql-recovery/bootstrap.yml \
   --ops-file p-ert/errands/mysql-recovery/rejoin-unsafe.yml \
   --ops-file p-ert/external-mysql.yml \
-  --ops-file p-ert/s3.yml \
   --var "cc_s3_access_key=$(jq -r .ert_iam_user_access_key terraform-state/metadata)" \
   --var "cc_s3_secret_key=$(jq -r .ert_iam_user_secret_access_key terraform-state/metadata)" \
   --var "cc_s3_bucket_name=$(jq -r .cloud_controller_bucket terraform-state/metadata)" \
