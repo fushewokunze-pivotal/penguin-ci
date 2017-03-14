@@ -10,6 +10,10 @@ inputs:
 - name: penguin-ci
 - name: bosh-vars-store 
 - name: terraform-state
+- name: rabbitmq-vars-store
+
+outputs:
+- name: new-rabbitmq-vars-store
 
 run:
   path: penguin-ci/tasks/deploy-p-rabbitmq.sh
