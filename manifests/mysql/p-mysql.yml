@@ -20,7 +20,7 @@ releases:
 stemcells:
 - alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   os: ubuntu-trusty
-  version: '3312.18'
+  version: '3263.21'
 instance_groups:
 - name: mysql
   azs:
