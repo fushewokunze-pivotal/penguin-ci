@@ -25,8 +25,7 @@ stemcells:
 instance_groups:
 - name: rabbitmq-server
   azs:
-  - z1
-  - z2
+  - services
   instances: 2
   lifecycle: service
   jobs:
@@ -58,7 +57,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.4.192
+        - 10.0.16.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -79,8 +78,8 @@ instance_groups:
       networks:
         apps: private
       static_ips:
-      - 10.0.4.193
-      - 10.0.5.192
+      - 10.0.16.193
+      - 10.0.16.194
       administrators:
         management:
           username: admin
@@ -111,12 +110,12 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.4.193
-    - 10.0.5.192
+    - 10.0.16.193
+    - 10.0.16.194
 
 - name: rabbitmq-haproxy
   azs:
-  - z2
+  - services
   instances: 1
   lifecycle: service
   jobs:
@@ -146,7 +145,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.4.192
+        - 10.0.16.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -167,8 +166,8 @@ instance_groups:
       networks:
         apps: private
       server_ips:
-      - 10.0.4.193
-      - 10.0.5.192
+      - 10.0.16.193
+      - 10.0.16.194
       ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
 
   update:
@@ -180,11 +179,11 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.5.193
+    - 10.0.16.196
 
 - name: rabbitmq-broker
   azs:
-  - z2
+  - services
   instances: 1
   lifecycle: service
   jobs:
@@ -214,7 +213,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.4.192
+        - 10.0.16.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -229,7 +228,7 @@ instance_groups:
       port: 
     rabbitmq-broker:
       route: pivotal-rabbitmq-broker
-      ip: 10.0.5.194
+      ip: 10.0.16.194
       networks:
         apps: private
       cc_endpoint: https://api.((system_domain))
@@ -247,16 +246,16 @@ instance_groups:
             {"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode": "automatic"}
           policy_priority: 50
         management_domain: pivotal-rabbitmq.((system_domain))
-        management_ip: 10.0.5.193
+        management_ip: 10.0.16.196
         hosts:
-        - 10.0.5.193
+        - 10.0.16.196
         dns_host: 
         administrator:
           username: broker
           password: ((broker_password))
         ssl: 
       service:
-        url: 10.0.5.194
+        url: 10.0.16.194
         username: admin
         password: ((rabbitmq_admin_password))
       logging:
@@ -265,7 +264,7 @@ instance_groups:
     cf:
       domain: ((system_domain))
       nats:
-        host: 10.0.4.191
+        host: 10.0.16.191
         port: 4222
         username: nats
         password: ((/aws-director-credhub/cf/nats_password))
@@ -279,11 +278,11 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.5.194
+    - 10.0.16.194
 
 - name: broker-registrar
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
@@ -314,7 +313,7 @@ instance_groups:
     - gateway
 - name: broker-deregistrar
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
