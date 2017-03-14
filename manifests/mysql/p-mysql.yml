@@ -41,7 +41,7 @@ instance_groups:
     release: mysql-monitoring
     consumes: {}
     provides: {}
-  vm_type: large.disk
+  vm_type: c3.large
   vm_extensions:
   - 100GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
