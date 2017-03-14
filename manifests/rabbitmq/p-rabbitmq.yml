@@ -10,7 +10,7 @@ releases:
   sha1: b09bd233f3517b9e75d656eeefeec3572f0d39dc
   version: 1.5.5
 - name: loggregator
-  url:  url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/loggregator-65.tgz
+  url: url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/loggregator-65.tgz
   sha1: 3526f5ca58c2101e44d6c0cbb3d490b2196ec58f
   version: '65'
 - name: rabbitmq-metrics
