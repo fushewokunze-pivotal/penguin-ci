@@ -21,7 +21,7 @@ releases:
 stemcells:
 - alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   os: ubuntu-trusty
-  version: '3263.17'
+  version: '3312.18'
 instance_groups:
 - name: rabbitmq-server
   azs:
