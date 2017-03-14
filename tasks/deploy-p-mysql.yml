@@ -6,7 +6,7 @@ image_resource:
   source: { repository: pcfbosh/minimal }
 
 inputs:
-- name: pcf-bosh-ci
+- name: penguin-ci
 - name: p-mysql-deployment
 - name: bosh-vars-store 
 - name: mysql-vars-store
