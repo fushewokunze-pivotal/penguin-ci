@@ -109,9 +109,9 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.16.197
-    - 10.0.16.198
-    - 10.0.16.199
+    - 10.0.7.197
+    - 10.0.7.198
+    - 10.0.7.199
 
 - name: backup-prepare
   azs:
@@ -178,8 +178,8 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.16.201
-    - 10.0.16.202
+    - 10.0.7.201
+    - 10.0.7.202
 
 - name: monitoring
   azs:
@@ -207,7 +207,7 @@ instance_groups:
       notify_only: false
       replication-canary:
         uaa_admin_client_secret: ((mysql_monitoring_admin_client_secret))
-        write_host: 10.0.16.201
+        write_host: 10.0.7.201
         canary_username: repcanary
         canary_password: ((cf_mysql_seeded_databases_password))
         notifications_client_username: mysql-monitoring
@@ -286,7 +286,7 @@ instance_groups:
           password: ((broker_qouta_enforcer))
           pause: 30
       external_host: p-mysql.((system_domain))
-      host: 10.0.16.201
+      host: 10.0.7.201
       mysql:
         admin_username: admin
         admin_password: ((cf_mysql_admin_password))
