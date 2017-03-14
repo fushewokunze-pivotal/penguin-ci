@@ -161,7 +161,7 @@ instance_groups:
         api_password: ((proxy_api_password))
     nats:
       machines:
-      - 10.0.16.200
+      - 10.0.5.191
       password: ((/aws-director-credhub/cf/nats_password))
       port: 4222
       user: nats
@@ -296,7 +296,7 @@ instance_groups:
       password: ((/aws-director-credhub/cf/nats_password))
       port: 4222
       machines:
-      - 10.0.16.200
+      - 10.0.5.191
     syslog_aggregator:
       address: 
       port: 
