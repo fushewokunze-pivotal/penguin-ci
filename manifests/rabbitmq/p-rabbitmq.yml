@@ -303,7 +303,7 @@ instance_groups:
       api_url: https://api.((system_domain))
       admin_username: push_apps_manager
       admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
-      skip_ssl_validation: false
+      skip_ssl_validation: ((skip_ssl_validation))
   
   update:
     max_in_flight: 1
@@ -334,7 +334,7 @@ instance_groups:
       api_url: https://api.((system_domain))
       admin_username: push_apps_manager
       admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
-      skip_ssl_validation: false
+      skip_ssl_validation: ((skip_ssl_validation))
   
   update:
     max_in_flight: 1
