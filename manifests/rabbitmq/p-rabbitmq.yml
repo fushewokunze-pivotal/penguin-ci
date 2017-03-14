@@ -118,7 +118,7 @@ instance_groups:
     az: z1
 - name: rabbitmq-haproxy
   azs:
-  - z1
+  - z2
   instances: 1
   lifecycle: service
   jobs:
