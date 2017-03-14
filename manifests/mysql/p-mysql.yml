@@ -24,8 +24,7 @@ stemcells:
 instance_groups:
 - name: mysql
   azs:
-  - z1
-  - z2
+  - services
   instances: 3
   persistent_disk_type: 50GB
   lifecycle: service
@@ -110,13 +109,13 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.4.195
-    - 10.0.4.196
-    - 10.0.5.195
+    - 10.0.16.197
+    - 10.0.16.198
+    - 10.0.16.199
 
 - name: backup-prepare
   azs:
-  - z1
+  - services
   instances: 0
   lifecycle: service
   jobs:
@@ -143,8 +142,7 @@ instance_groups:
   persistent_disk_type: '100GB'
 - name: proxy
   azs:
-  - z1
-  - z2
+  - services
   instances: 2
   persistent_disk_type: 1GB
   lifecycle: service
@@ -163,7 +161,7 @@ instance_groups:
         api_password: ((proxy_api_password))
     nats:
       machines:
-      - 10.0.4.191
+      - 10.0.16.200
       password: ((/aws-director-credhub/cf/nats_password))
       port: 4222
       user: nats
@@ -180,12 +178,12 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.5.196
-    - 10.0.4.197
+    - 10.0.16.201
+    - 10.0.16.202
 
 - name: monitoring
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: service
   jobs:
@@ -209,7 +207,7 @@ instance_groups:
       notify_only: false
       replication-canary:
         uaa_admin_client_secret: ((mysql_monitoring_admin_client_secret))
-        write_host: 10.0.5.196
+        write_host: 10.0.16.201
         canary_username: repcanary
         canary_password: ((cf_mysql_seeded_databases_password))
         notifications_client_username: mysql-monitoring
@@ -232,7 +230,7 @@ instance_groups:
 
 - name: cf-mysql-broker
   azs:
-  - z1
+  - services
   instances: 2
   lifecycle: service
   jobs:
@@ -288,7 +286,7 @@ instance_groups:
           password: ((broker_qouta_enforcer))
           pause: 30
       external_host: p-mysql.((system_domain))
-      host: 10.0.5.196
+      host: 10.0.16.201
       mysql:
         admin_username: admin
         admin_password: ((cf_mysql_admin_password))
@@ -298,7 +296,7 @@ instance_groups:
       password: ((/aws-director-credhub/cf/nats_password))
       port: 4222
       machines:
-      - 10.0.4.191
+      - 10.0.16.200
     syslog_aggregator:
       address: 
       port: 
@@ -314,7 +312,7 @@ instance_groups:
 
 - name: broker-registrar
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
@@ -354,7 +352,7 @@ instance_groups:
     - gateway
 - name: deregister-and-purge-instances
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
@@ -384,7 +382,7 @@ instance_groups:
     - gateway
 - name: rejoin-unsafe
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
@@ -410,7 +408,7 @@ instance_groups:
     - gateway
 - name: smoke-tests
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
@@ -462,7 +460,7 @@ instance_groups:
     - gateway
 - name: bootstrap
   azs:
-  - z1
+  - services
   instances: 1
   lifecycle: errand
   jobs:
