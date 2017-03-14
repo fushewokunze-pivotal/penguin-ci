@@ -26,6 +26,7 @@ instance_groups:
 - name: rabbitmq-server
   azs:
   - z1
+  - z2
   instances: 2
   lifecycle: service
   jobs:
