@@ -57,7 +57,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.4.16
+        - 10.0.4.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -78,8 +78,8 @@ instance_groups:
       networks:
         apps: private
       static_ips:
-      - 10.0.4.27
-      - 10.0.5.15
+      - 10.0.4.193
+      - 10.0.5.192
       administrators:
         management:
           username: admin
@@ -110,8 +110,8 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.4.27
-    - 10.0.5.15
+    - 10.0.4.193
+    - 10.0.5.192
   migrated_from:
   - name: rabbitmq-server
     az: z1
@@ -147,7 +147,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.4.16
+        - 10.0.4.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -168,8 +168,8 @@ instance_groups:
       networks:
         apps: private
       server_ips:
-      - 10.0.4.27
-      - 10.0.5.15
+      - 10.0.4.193
+      - 10.0.5.192
       ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
 
   update:
@@ -181,7 +181,7 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.5.19
+    - 10.0.5.193
   migrated_from:
   - name: rabbitmq-haproxy
     az: z1
@@ -217,7 +217,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.4.16
+        - 10.0.4.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -232,7 +232,7 @@ instance_groups:
       port: 
     rabbitmq-broker:
       route: pivotal-rabbitmq-broker
-      ip: 10.0.5.18
+      ip: 10.0.5.194
       networks:
         apps: private
       cc_endpoint: https://api.((system_domain))
@@ -250,16 +250,16 @@ instance_groups:
             {"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode": "automatic"}
           policy_priority: 50
         management_domain: pivotal-rabbitmq.((system_domain))
-        management_ip: 10.0.5.19
+        management_ip: 10.0.5.193
         hosts:
-        - 10.0.5.19
+        - 10.0.5.193
         dns_host: 
         administrator:
           username: broker
           password: ((broker_password))
         ssl: 
       service:
-        url: 10.0.5.18
+        url: 10.0.5.194
         username: admin
         password: ((rabbitmq_admin_password))
       logging:
@@ -282,7 +282,7 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.5.18
+    - 10.0.5.194
   migrated_from:
   - name: rabbitmq-broker
     az: z1
