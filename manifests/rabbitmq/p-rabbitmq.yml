@@ -57,7 +57,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.16.192
+        - 10.0.7.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -78,8 +78,8 @@ instance_groups:
       networks:
         apps: private
       static_ips:
-      - 10.0.16.193
-      - 10.0.16.194
+      - 10.0.7.193
+      - 10.0.7.194
       administrators:
         management:
           username: admin
@@ -110,8 +110,8 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.16.193
-    - 10.0.16.194
+    - 10.0.7.193
+    - 10.0.7.194
 
 - name: rabbitmq-haproxy
   azs:
@@ -145,7 +145,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.16.192
+        - 10.0.7.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -166,8 +166,8 @@ instance_groups:
       networks:
         apps: private
       server_ips:
-      - 10.0.16.193
-      - 10.0.16.194
+      - 10.0.7.193
+      - 10.0.7.194
       ports: 15672, 5672, 5671, 1883, 8883, 61613, 61614, 15674
 
   update:
@@ -179,7 +179,7 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.16.196
+    - 10.0.7.196
 
 - name: rabbitmq-broker
   azs:
@@ -213,7 +213,7 @@ instance_groups:
     loggregator:
       etcd:
         machines:
-        - 10.0.16.192
+        - 10.0.7.192
     loggregator_endpoint:
       shared_secret: ((/aws-director-credhub/cf/dropsonde_shared_secret))
     service_metrics:
@@ -228,7 +228,7 @@ instance_groups:
       port: 
     rabbitmq-broker:
       route: pivotal-rabbitmq-broker
-      ip: 10.0.16.194
+      ip: 10.0.7.194
       networks:
         apps: private
       cc_endpoint: https://api.((system_domain))
@@ -246,16 +246,16 @@ instance_groups:
             {"ha-mode": "exactly", "ha-params": 2, "ha-sync-mode": "automatic"}
           policy_priority: 50
         management_domain: pivotal-rabbitmq.((system_domain))
-        management_ip: 10.0.16.196
+        management_ip: 10.0.7.196
         hosts:
-        - 10.0.16.196
+        - 10.0.7.196
         dns_host: 
         administrator:
           username: broker
           password: ((broker_password))
         ssl: 
       service:
-        url: 10.0.16.194
+        url: 10.0.7.194
         username: admin
         password: ((rabbitmq_admin_password))
       logging:
@@ -278,7 +278,7 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.16.194
+    - 10.0.7.194
 
 - name: broker-registrar
   azs:
