@@ -4,11 +4,11 @@ releases:
 - name: cf-rabbitmq
   url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/cf-rabbitmq-222.15.0.tgz
   sha1: ddd29a4cdc59f1dd9da3ca0f833ee867f1cc63a3
-  version: 222.15.0
+  version: '222.15.0'
 - name: service-metrics
   url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/service-metrics-1.5.5.tgz
   sha1: b09bd233f3517b9e75d656eeefeec3572f0d39dc
-  version: 1.5.5
+  version: '1.5.5'
 - name: loggregator
   url: url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/loggregator-65.tgz
   sha1: 3526f5ca58c2101e44d6c0cbb3d490b2196ec58f
@@ -16,7 +16,7 @@ releases:
 - name: rabbitmq-metrics
   url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/rabbitmq-metrics-1.54.0-dev.2.tgz
   sha1: b0c7d729fab13e292d50afeab40d4d178d8f8a43
-  version: 1.54.0
+  version: '1.54.0'
 
 stemcells:
 - alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
