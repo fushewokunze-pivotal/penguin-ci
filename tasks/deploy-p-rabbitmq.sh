@@ -30,3 +30,4 @@ bosh -n deploy penguin-ci/manifests/rabbitmq/p-rabbitmq.yml \
   --vars-file p-rabbitmq-vars.yml 
   
 bosh run-errand broker-registrar  
+
