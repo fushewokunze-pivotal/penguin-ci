@@ -27,6 +27,7 @@ instance_groups:
   - z1
   - z2
   instances: 3
+  persistent_disk_type: 50GB
   lifecycle: service
   jobs:
   - name: mysql
@@ -145,6 +146,7 @@ instance_groups:
   - z1
   - z2
   instances: 2
+  persistent_disk_type: 1GB
   lifecycle: service
   jobs:
   - name: proxy
