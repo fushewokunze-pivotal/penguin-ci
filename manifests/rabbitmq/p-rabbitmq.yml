@@ -278,7 +278,7 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.7.194
+    - 10.0.7.198
 
 - name: broker-registrar
   azs:
