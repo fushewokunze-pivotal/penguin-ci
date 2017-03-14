@@ -239,6 +239,7 @@ instance_groups:
     consumes: {}
     provides: {}
   vm_type: m3.medium
+  persistent_disk_type: 1GB
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     broker:
