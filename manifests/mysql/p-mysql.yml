@@ -2,12 +2,20 @@
 name: p-mysql
 releases:
 - name: cf-mysql
+  url: https://s3-us-west-1.amazonaws.com/p-mysql-1.7.25/cf-mysql-32.6.0.tgz
+  sha1: 9797e99fe1ca49ad779f4ad5f561fd7ff6aa979a
   version: 32.6.0
 - name: mysql-backup
+  url: https://s3-us-west-1.amazonaws.com/p-mysql-1.7.25/mysql-backup-1.30.0.tgz
+  sha1: 82ac1ceff5dfe2c28a9f6ea0301f7425d856d63e 
   version: 1.30.0
 - name: service-backup
+  url: https://s3-us-west-1.amazonaws.com/p-mysql-1.7.25/service-backup-18.0.3.tgz
+  sha1: e21b24840ba551d9899b045e9f93dbd7219a17e5
   version: 18.0.3
 - name: mysql-monitoring
+  url: https://s3-us-west-1.amazonaws.com/p-mysql-1.7.25/mysql-monitoring-7.tgz
+  sha1: 11b703640af27e7980a3ab5050994048d39ef485
   version: '7'
 stemcells:
 - alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
