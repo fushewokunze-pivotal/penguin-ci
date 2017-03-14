@@ -228,7 +228,7 @@ instance_groups:
       port: 
     rabbitmq-broker:
       route: pivotal-rabbitmq-broker
-      ip: 10.0.7.198
+      ip: 10.0.7.203
       networks:
         apps: private
       cc_endpoint: https://api.((system_domain))
@@ -255,7 +255,7 @@ instance_groups:
           password: ((broker_password))
         ssl: 
       service:
-        url: 10.0.7.198
+        url: 10.0.7.203
         username: admin
         password: ((rabbitmq_admin_password))
       logging:
@@ -278,7 +278,7 @@ instance_groups:
     - dns
     - gateway
     static_ips:
-    - 10.0.7.198
+    - 10.0.7.203
 
 - name: broker-registrar
   azs:
