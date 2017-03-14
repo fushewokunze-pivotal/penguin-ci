@@ -491,7 +491,6 @@ update:
   max_in_flight: 1
   max_errors: 2
   serial: true
-
 variables:
 - name: cf_mysql_admin_password
   type: password
@@ -505,3 +504,25 @@ variables:
   type: password
 - name: cf_mysql_galera_healthcheck_db_password
   type: password  
+- name: cf_mysql_backup_endpoint_username
+  type: password
+- name: cf_mysql_backup_endpoint_password
+  type: password
+- name: proxy_api_password
+  type: password
+- name: mysql_monitoring_admin_client_secret
+  type: password
+- name: mysql_monitoring_client_secret
+  type: password
+- name: mysql_broker_db_password
+  type: password
+- name: mysql_broker_auth_username
+  type: password
+- name: mysql_broker_auth_password
+  type: password
+- name: mysql_broker_dashboard_client_secret
+  type: password
+- name: broker_qouta_enforcer
+  type: password
+- name: cf_mysql_smoke_tests_password
+  type: password
