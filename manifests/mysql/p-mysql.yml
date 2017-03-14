@@ -240,6 +240,8 @@ instance_groups:
     provides: {}
   vm_type: m3.medium
   persistent_disk_type: 1GB
+  vm_extensions:
+  - 5GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     broker:
