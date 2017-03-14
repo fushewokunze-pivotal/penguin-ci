@@ -264,7 +264,7 @@ instance_groups:
     cf:
       domain: ((system_domain))
       nats:
-        host: 10.0.16.191
+        host: 10.0.5.191
         port: 4222
         username: nats
         password: ((/aws-director-credhub/cf/nats_password))
