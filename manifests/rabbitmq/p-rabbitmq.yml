@@ -1,5 +1,5 @@
 ---
-name: p-rabbitmq
+name: cf-rabbitmq
 releases:
 - name: cf-rabbitmq
   url: https://s3-us-west-1.amazonaws.com/p-rabbitmq-1.7.14/cf-rabbitmq-222.15.0.tgz
