@@ -46,6 +46,8 @@ instance_groups:
     consumes: {}
     provides: {}
   vm_type: m3.large
+  vm_extensions:
+  - 100GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     metron_agent:
@@ -113,7 +115,6 @@ instance_groups:
   migrated_from:
   - name: rabbitmq-server
     az: z1
-  persistent_disk_type: '10240'
 - name: rabbitmq-haproxy
   azs:
   - z1
