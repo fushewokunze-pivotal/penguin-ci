@@ -17,4 +17,4 @@ outputs:
 - name: new-mysql-vars-store
 
 run:
-  path: penguin-ci/tasks/deploy-mysql.sh
+  path: penguin-ci/tasks/deploy-p-mysql.sh
