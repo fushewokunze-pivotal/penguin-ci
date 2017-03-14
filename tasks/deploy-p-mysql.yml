@@ -11,6 +11,7 @@ inputs:
 - name: bosh-vars-store 
 - name: mysql-vars-store
 - name: terraform-state
+- name: pcf-bosh-ci
 
 
 outputs:
