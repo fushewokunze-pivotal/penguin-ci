@@ -28,3 +28,5 @@ cp rabbitmq-vars-store/*-rabbitmq-vars-store.yml new-rabbitmq-vars-store/rabbitm
 bosh -n deploy penguin-ci/manifests/rabbitmq/p-rabbitmq.yml \
   --deployment cf-rabbitmq \
   --vars-file p-rabbitmq-vars.yml 
+  
+bosh run-errand broker-registrar  
