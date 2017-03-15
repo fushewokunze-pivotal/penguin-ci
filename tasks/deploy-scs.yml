@@ -9,10 +9,6 @@ inputs:
 - name: penguin-ci
 - name: bosh-vars-store 
 - name: terraform-state
-- name: scs-vars-store
-
-outputs:
-- name: new-scs-vars-store
 
 run:
   path: penguin-ci/tasks/deploy-scs.sh
