@@ -1,0 +1,18 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: { repository: pcfbosh/minimal }
+
+inputs:
+- name: penguin-ci
+- name: bosh-vars-store 
+- name: terraform-state
+- name: scs-vars-store
+
+outputs:
+- name: new-scs-vars-store
+
+run:
+  path: penguin-ci/tasks/deploy-scs.sh
