@@ -20,9 +20,9 @@ releases:
 #  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=56
 #  sha1: 2b85e1bdc31f41a26b454f4731bf2d1df2ea17de #
 - name: bosh-aws-cpi    
-  version: 60
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=60
-  sha1: 8e40a9ff892204007889037f094a1b0d23777058
+  version: 62
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=62
+  sha1: f36967927ceae09e5663a41fdda199edfe649dc6
 
 resource_pools:
 - name: vms
