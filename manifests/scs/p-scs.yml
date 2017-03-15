@@ -23,6 +23,8 @@ instance_groups:
     consumes: {}
     provides: {}
   vm_type: t2.small
+  vm_extensions:
+  - 10GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     domain: ((system_domain))
@@ -83,6 +85,8 @@ instance_groups:
     consumes: {}
     provides: {}
   vm_type: t2.small
+  vm_extensions:
+  - 10GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     domain: ((system_domain))
@@ -126,6 +130,8 @@ instance_groups:
     consumes: {}
     provides: {}
   vm_type: t2.small
+  vm_extensions:
+  - 10GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     domain: ((system_domain))
@@ -165,6 +171,8 @@ instance_groups:
     consumes: {}
     provides: {}
   vm_type: t2.small
+  vm_extensions:
+  - 10GB_ephemeral_disk
   stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   properties:
     domain: ((system_domain))
