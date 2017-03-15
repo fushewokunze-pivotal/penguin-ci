@@ -210,8 +210,8 @@ instance_groups:
         write_host: 10.0.7.201
         canary_username: repcanary
         canary_password: ((cf_mysql_seeded_databases_password))
-        notifications_client_username: mysql-monitoring
-        notifications_client_secret: ((mysql_monitoring_client_secret))
+        notifications_client_username: notifications
+        notifications_client_secret: ((/aws-director-credhub/cf/notifications_client_password))
         canary_alert_to: fushewokunze@pivota.io
         poll_frequency: 30
         write_read_delay: 20
@@ -512,10 +512,6 @@ variables:
 - name: cf_mysql_backup_endpoint_password
   type: password
 - name: proxy_api_password
-  type: password
-- name: mysql_monitoring_admin_client_secret
-  type: password
-- name: mysql_monitoring_client_secret
   type: password
 - name: mysql_broker_db_password
   type: password
