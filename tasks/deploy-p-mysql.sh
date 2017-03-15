@@ -43,5 +43,5 @@ bosh -n deploy penguin-ci/manifests/mysql/p-mysql.yml \
   --deployment p-mysql \
   --vars-file p-mysql-vars.yml 
 
-bosh run-errand broker-registrar
+bosh run-errand broker-registrar -d p-mysql
 
