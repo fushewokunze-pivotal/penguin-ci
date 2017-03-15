@@ -7,7 +7,6 @@ image_resource:
 
 inputs:
 - name: penguin-ci
-- name: p-mysql-deployment
 - name: bosh-vars-store 
 - name: mysql-vars-store
 - name: terraform-state
