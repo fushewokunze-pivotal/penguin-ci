@@ -106,7 +106,7 @@ instance_groups:
       app_uri: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: admin
+        admin_user: push_apps_manager
         admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       uaa:
         admin_client_id: admin
@@ -142,12 +142,12 @@ instance_groups:
       broker:
         org_name: 
       smoke_test:
-        user: admin
+        user: push_apps_manager
         password: ((/aws-director-credhub/cf/push_apps_manager_password))
         space: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: admin
+        admin_user: push_apps_manager
         admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       uaa:
         admin_client_id: admin
@@ -199,7 +199,7 @@ instance_groups:
       app_uri: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: admin
+        admin_user: push_apps_manager
         admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       uaa:
         admin_client_id: admin
