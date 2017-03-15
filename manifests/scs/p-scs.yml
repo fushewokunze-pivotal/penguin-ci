@@ -182,7 +182,7 @@ instance_groups:
         plan_names: 
       worker:
         client_id: 
-        client_secret: ((worker_client_secret))
+        client_secret: ((broker_worker_client_secret))
       instances:
         org_name: 
         space_name: 
