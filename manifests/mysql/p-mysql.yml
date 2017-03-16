@@ -293,7 +293,7 @@ instance_groups:
       mysql:
         admin_username: admin
         admin_password: ((cf_mysql_admin_password))
-        persistent_disk: '100GB'
+        persistent_disk: 102400
     nats:
       user: nats
       password: ((/aws-director-credhub/cf/nats_password))
