@@ -29,7 +29,7 @@ instance_groups:
   properties:
     domain: ((system_domain))
     app_domains:
-    - apps.((system_domain))
+    - ((apps_domain))
     ssl:
       skip_cert_verify: true
     spring_cloud_broker:
@@ -91,7 +91,7 @@ instance_groups:
   properties:
     domain: ((system_domain))
     app_domains:
-    - apps.((system_domain))
+    - ((apps_domain))
     ssl:
       skip_cert_verify: true
     spring_cloud_broker:
@@ -177,7 +177,7 @@ instance_groups:
   properties:
     domain: ((system_domain))
     app_domains:
-    - apps.((system_domain))
+    - ((apps_domain))
     ssl:
       skip_cert_verify: true
     spring_cloud_broker:
