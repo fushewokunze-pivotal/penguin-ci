@@ -10,7 +10,7 @@ cat <<SCSVARS > scs-vars.yml
 ########################
 # Cloud Foundry config #
 ########################
-apps_domain: [$(jq -r .apps_domain terraform-state/metadata)]
+apps_domain: $(jq -r .apps_domain terraform-state/metadata)
 system_domain: $(jq -r .sys_domain terraform-state/metadata)
 skip_ssl_validation: true
 SCSVARS
