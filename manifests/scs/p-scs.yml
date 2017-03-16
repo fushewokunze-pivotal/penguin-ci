@@ -59,8 +59,8 @@ instance_groups:
       persistence_store_type: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: push_apps_manager
-        admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+        admin_user: admin
+        admin_password: ((/aws-director-credhub/cf/uaa_scim_users_admin_password))
       uaa:
         admin_client_id: admin
         admin_client_secret: ((/aws-director-credhub/cf/uaa_admin_client_secret))
@@ -106,8 +106,8 @@ instance_groups:
       app_uri: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: push_apps_manager
-        admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+        admin_user: admin
+        admin_password: ((/aws-director-credhub/cf/uaa_scim_users_admin_password))
       uaa:
         admin_client_id: admin
         admin_client_secret: ((/aws-director-credhub/cf/uaa_admin_client_secret))
@@ -147,8 +147,8 @@ instance_groups:
         space: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: push_apps_manager
-        admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+        admin_user: admin
+        admin_password: ((/aws-director-credhub/cf/uaa_scim_users_admin_password))
       uaa:
         admin_client_id: admin
         admin_client_secret: ((/aws-director-credhub/cf/uaa_admin_client_secret))
@@ -199,8 +199,8 @@ instance_groups:
       app_uri: 
       encryption_key: ((broker_encryption_key))
       cf:
-        admin_user: push_apps_manager
-        admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+        admin_user: admin
+        admin_password: ((/aws-director-credhub/cf/uaa_scim_users_admin_password))
       uaa:
         admin_client_id: admin
         admin_client_secret: ((/aws-director-credhub/cf/uaa_admin_client_secret))
