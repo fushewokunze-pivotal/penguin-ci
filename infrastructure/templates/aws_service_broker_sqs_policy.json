@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1471890189000",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:ListQueues",
+                "sqs:PurgeQueue",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage"
+            ],
+            "Resource": [
+                "arn:aws:broker:resource::"
+            ]
+        }
+    ]
+}

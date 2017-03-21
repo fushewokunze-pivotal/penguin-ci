@@ -1,0 +1,487 @@
+---
+resource_types:
+- name: terraform
+  type: docker-image
+  source:
+    repository: ljfranklin/terraform-resource
+
+- name: gcs-resource
+  type: docker-image
+  source:
+    repository: frodenas/gcs-resource
+
+resources:
+
+- name: penguin-ci
+  type: git
+  source:
+    uri: https://github.com/fushewokunze-pivotal/penguin-ci.git
+    branch: master
+
+#########################
+# PCF BOSH Repositories #
+#########################
+
+- name: pcf-bosh-ci
+  type: git
+  source:
+    #uri: https://github.com/pivotal-cf/pcf-bosh-ci
+    uri: https://github.com/fushewokunze-pivotal/pcf-bosh-ci
+    branch: master
+
+- name: terraforming-aws
+  type: git
+  source:
+    #uri: https://github.com/pivotal-cf/pcf-bosh-terraforming-aws
+    uri: https://github.com/fushewokunze-pivotal/pcf-bosh-terraforming-aws.git
+    branch: master
+
+- name: terraforming-aws-penguin
+  type: git
+  source:
+    uri: https://github.com/fushewokunze-pivotal/penguin-ci.git
+    branch: master
+
+- name: terraform
+  type: docker-image
+  source:
+    repository: ljfranklin/terraform-resource
+
+- name: cloud-config
+  type: git
+  source:
+    #uri: https://github.com/pivotal-cf/p-ert-bosh-experiment
+    uri: https://github.com/fushewokunze-pivotal/p-ert-bosh-experiment.git
+    branch: "1.9"
+    #branch: master
+    paths: [aws/cloud-config.yml]
+
+- name: p-ert-bosh-experiment
+  type: git
+  source:
+    uri: https://github.com/fushewokunze-pivotal/p-ert-bosh-experiment
+    #uri: https://github.com/pivotal-cf/p-ert-bosh-experiment
+    branch: "1.9"
+    #branch: master
+    ignore_paths: [gcp/cloud-config.yml]
+
+###################
+# CF Repositories #
+###################
+
+- name: cf-deployment
+  type: git
+  source:
+    #uri: https://github.com/cloudfoundry/cf-deployment
+    #branch: master
+    #tag_filter: "0\\.0\\.0"
+    uri: https://github.com/fushewokunze-pivotal/cf-deployment
+    branch: penguin
+    
+- name: cf-acceptance-tests
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-acceptance-tests
+    branch: master
+
+- name: bosh-deployment
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/bosh-deployment
+    branch: master
+
+##############
+# PCF Assets #
+##############
+
+- name: closed-source-releases-zip
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: closed-source-releases.zip
+
+- name: ipsec-zip
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: ipsec-1.5.37.tgz
+
+- name: ipsec-config
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: ipsec-addon.yml
+
+- name: mysql-vars-store
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: '{{env_name}}-mysql-vars-store.yml'
+
+- name: rabbitmq-vars-store
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: '{{env_name}}-rabbitmq-vars-store.yml'
+
+#########################
+# Pipeline Global State #
+#########################
+
+- name: terraform-vars
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: terraform-aws.tfvars.yml
+
+- name: bosh-private-key
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: bosh-private-key
+
+##################
+# Pipeline State #
+##################
+
+- name: terraform-state
+  type: terraform
+  source:
+    storage:
+      bucket: penguin-vars
+      bucket_path: terraform-environments
+      access_key_id: {{gcs_access_key_id}}
+      secret_access_key: {{gcs_secret_access_key}}
+      endpoint: storage.googleapis.com
+  delete_on_failure: true
+
+- name: terraform-db-state
+  type: terraform
+  source:
+    storage:
+      bucket: penguin-vars
+      bucket_path: terraform-environment-dbs
+      access_key_id: {{gcs_access_key_id}}
+      secret_access_key: {{gcs_secret_access_key}}
+      endpoint: storage.googleapis.com
+  delete_on_failure: true
+
+- name: bosh-state
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: '{{env_name}}-bosh-state.json'
+
+- name: bosh-vars-store
+  type: gcs-resource
+  source:
+    bucket: penguin-vars
+    json_key: {{google_json_key}}
+    versioned_file: '{{env_name}}-bosh-vars-store.yml'
+
+#- name: cf-vars-store
+#  type: gcs-resource
+#  source:
+#    bucket: penguin-vars
+#    json_key: {{google_json_key}}
+#    versioned_file: '{{env_name}}-cf-vars-store.yml'
+
+jobs:
+
+##################
+# Infrastructure #
+##################
+
+- name: terraform-up
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: terraforming-aws
+      trigger: true
+    - get: terraform-vars
+      trigger: true
+    - get: terraform
+      trigger: true
+  - put: terraform-state
+    params:
+      var_file: terraform-vars/terraform-aws.tfvars.yml
+      terraform_source: terraforming-aws//infrastructure
+      delete_on_failure: true
+      env_name: {{env_name}}
+  - task: generate-terraform-db-vars
+    file: pcf-bosh-ci/tasks/generate-terraform-db-vars.yml
+  - put: terraform-db-state
+    params:
+      var_file: terraform-db-vars/terraform.tfvars.yml
+      terraform_source: terraforming-aws//db-seeding
+      delete_on_failure: true
+      env_name: {{env_name}}
+
+- name: terraform-up-penguin
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: terraforming-aws
+      trigger: true
+    - get: terraforming-aws-penguin
+      trigger: true
+    - get: terraform-vars
+      trigger: true
+    - get: terraform
+      trigger: true
+      passed: [terraform-up]
+  - put: terraform-state
+    params:
+      var_file: terraform-vars/terraform-aws.tfvars.yml
+      terraform_source: penguin-ci//infrastructure
+      delete_on_failure: true
+      env_name: {{env_name}}
+
+
+- name: deploy-director
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: bosh-deployment
+      version:
+        ref: ccca4c9f7bcdd0f217c8c3adf186648c52b3b137
+    - get: bosh-state
+    - get: penguin-ci
+    - get: bosh-private-key
+    - get: bosh-vars-store
+    - get: terraform-state    
+      trigger: true
+      passed: [terraform-up-penguin]
+  - task: deploy-director
+    file: pcf-bosh-ci/tasks/deploy-director-aws.yml
+    ensure:
+      aggregate:
+      - put: bosh-state
+        params:
+          file: new-bosh-state/*
+      - put: bosh-vars-store
+        params:
+          file: new-bosh-vars-store/*
+
+- name: upload-cloud-config
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: cloud-config
+      trigger: true
+    - get: bosh-vars-store
+      trigger: true
+      passed: [deploy-director]
+    - get: terraform-state
+      trigger: true
+      passed: [deploy-director]
+  - task: upload-cloud-config
+    file: pcf-bosh-ci/tasks/upload-cloud-config-aws.yml
+
+- name: update-runtime-config
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: ipsec-zip
+    - get: ipsec-config
+      trigger: true
+    - get: penguin-ci
+      trigger: true
+    - get: bosh-vars-store
+      trigger: true
+      passed: [deploy-director]
+    - get: terraform-state
+      trigger: true
+      passed: [deploy-director]
+  - task: update-runtime-config
+    file: pcf-bosh-ci/tasks/update-runtime-config.yml
+
+
+- name: upload-stemcell
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: cf-deployment
+      trigger: true
+    - get: bosh-vars-store
+      trigger: true
+      passed: [deploy-director]
+    - get: terraform-state
+      passed: [deploy-director]
+  - task: stemcell-url-from-cf-deployment
+    file: pcf-bosh-ci/tasks/stemcell-url-from-cf-deployment.yml
+    params:
+      NAME: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+  - task: upload-stemcell
+    file: pcf-bosh-ci/tasks/upload-stemcell.yml
+
+#################
+# Cloud Foundry #
+#################
+
+- name: deploy-ert
+  serial: true
+  serial_groups: [cf-bosh-deployment]
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: cf-deployment
+      trigger: true
+      passed: [upload-stemcell]
+    - get: p-ert
+      resource: p-ert-bosh-experiment
+      trigger: true
+    #- get: cf-vars-store
+    - get: closed-source-releases-zip
+    - get: bosh-vars-store
+      trigger: true
+      passed: [update-runtime-config, upload-cloud-config, upload-stemcell]
+    - get: terraform-state
+      passed: [update-runtime-config, upload-cloud-config, upload-stemcell]
+    - get: penguin-ci
+      trigger: true  
+  - task: extract-closed-source-releases
+    file: pcf-bosh-ci/tasks/extract-closed-source-releases.yml
+  - task: deploy-ert
+    #file: pcf-bosh-ci/tasks/deploy-ert-aws.yml
+    file: penguin-ci/tasks/deploy-ert-aws.yml
+    params:
+      SMTP_HOST_NAME: {{smtp_host_name}}
+      SMTP_HOST_PORT: {{smtp_host_port}}
+      SMTP_SENDER_USERNAME: {{smtp_sender_username}}
+      SMTP_SENDER_PASSWORD: {{smtp_sender_password}}
+    #ensure:
+    #    put: cf-vars-store
+    #    params:
+    #      file: new-cf-vars-store/*
+
+###################
+# Default Errands #
+###################
+
+- name: deploy-cf-mysql
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+      passed: [deploy-ert]
+      trigger: true
+    - get: mysql-vars-store
+    - get: penguin-ci
+      passed: [deploy-ert]
+      trigger: true
+    - get: bosh-vars-store
+      trigger: true
+      passed: [deploy-ert]
+    - get: terraform-state
+      trigger: true
+      passed: [deploy-ert]
+    - get: cf-deployment
+      passed: [deploy-ert]
+      trigger: true
+  - task: deploy-mysql
+    file: penguin-ci/tasks/deploy-p-mysql.yml
+
+- name: deploy-p-rabbitmq
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+      passed: [deploy-ert]
+      trigger: true
+    - get: penguin-ci
+      passed: [deploy-ert]
+      trigger: true
+    - get: rabbitmq-vars-store
+    - get: bosh-vars-store
+      passed: [deploy-ert]
+      trigger: true
+    - get: terraform-state
+      passed: [deploy-ert]
+      trigger: true
+    - get: cf-deployment
+      passed: [deploy-ert]
+      trigger: true
+  - task: deploy-p-rabbitmq
+    file: penguin-ci/tasks/deploy-p-rabbitmq.yml
+
+- name: deploy-scs
+  serial: true
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+      passed: [deploy-p-rabbitmq,deploy-cf-mysql]
+      trigger: true
+    - get: penguin-ci
+      passed: [deploy-p-rabbitmq,deploy-cf-mysql]
+      trigger: true
+    - get: bosh-vars-store
+      passed: [deploy-p-rabbitmq,deploy-cf-mysql]
+      trigger: true
+    - get: terraform-state
+      passed: [deploy-p-rabbitmq,deploy-cf-mysql]
+      trigger: true
+  - task: deploy-p-scs
+    file: penguin-ci/tasks/deploy-scs.yml
+
+- name: push-apps-manager
+  serial: true
+  serial_groups: [cf-bosh-deployment]
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: bosh-vars-store
+      passed: [deploy-ert]
+    - get: terraform-state
+      passed: [deploy-ert]
+    - get: cf-deployment
+      passed: [deploy-ert]
+  - task: push-apps-manager
+    file: pcf-bosh-ci/tasks/run-errand.yml
+    params:
+      DEPLOYMENT: cf
+      ERRAND: push-apps-manager
+
+#########
+# Tests #
+#########
+
+- name: smoke-tests
+  serial_groups: [cf-bosh-deployment]
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: bosh-vars-store
+      passed: [deploy-scs]
+    #- get: cf-vars-store
+    #  trigger: true
+    #  passed: [push-apps-manager]
+    - get: terraform-state
+      passed: [deploy-scs]
+  - task: run-smoke-tests
+    file: pcf-bosh-ci/tasks/run-errand.yml
+    params:
+      DEPLOYMENT: cf
+      ERRAND: smoke-tests
+
+- name: run-cats
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: cf-acceptance-tests
+      version: {ref: 8691a293fe613ee817e69d6760deec40820af421}
+    #- get: cf-vars-store
+    #  trigger: true
+    #  passed: [push-apps-manager]
+    - get: terraform-state
+      passed: [deploy-scs]
+  - task: enable-diego-docker
+    file: pcf-bosh-ci/tasks/enable-diego-docker.yml
+  - task: run-cats
+    file: pcf-bosh-ci/tasks/run-cats.yml

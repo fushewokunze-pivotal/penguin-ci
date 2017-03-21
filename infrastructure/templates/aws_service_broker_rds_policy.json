@@ -1,0 +1,16 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1471636048000",
+            "Effect": "Allow",
+            "Action": [
+                "rds:ListTagsForResource",
+                "rds:DescribeDbInstances"
+            ],
+            "Resource": [
+                "arn:aws:broker:resource::"
+            ]
+        }
+    ]
+}
