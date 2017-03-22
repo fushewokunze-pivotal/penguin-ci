@@ -1,3 +1,10 @@
+provider "aws" {
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
+  region     = "${var.region}"
+}
+
+
 resource "aws_iam_user" "ert_iam_user" {
   name = "${var.env_name}_ert_iam_user"
 }
