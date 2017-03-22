@@ -732,3 +732,11 @@ update:
   max_in_flight: 1
   max_errors: 2
   serial: true
+  
+variables:
+- name: rds_master_password
+  type: password 
+- name: broker_password
+  type: password
+  
+  
