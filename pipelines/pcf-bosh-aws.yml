@@ -41,6 +41,7 @@ resources:
   source:
     uri: https://github.com/fushewokunze-pivotal/penguin-ci.git
     branch: master
+    paths: [infrastructure]
 
 - name: terraform
   type: docker-image
@@ -162,6 +163,18 @@ resources:
       endpoint: storage.googleapis.com
   delete_on_failure: true
 
+#- name: terraform-state-penguin
+#  type: terraform
+#  source:
+#    storage:
+#      bucket: penguin-vars
+#      bucket_path: terraform-environments
+#      access_key_id: {{gcs_access_key_id}}
+#      secret_access_key: {{gcs_secret_access_key}}
+#      endpoint: storage.googleapis.com
+#  delete_on_failure: true
+
+
 - name: terraform-db-state
   type: terraform
   source:
@@ -231,17 +244,17 @@ jobs:
     - get: pcf-bosh-ci
     - get: terraforming-aws
       trigger: true
-    - get: terraforming-aws-penguin
-      trigger: true
+      passed: [terraform-up]
     - get: terraform-vars
       trigger: true
     - get: terraform
       trigger: true
-      passed: [terraform-up]
+    - get: terraforming-aws-penguin
+      trigger: true
   - put: terraform-state
     params:
       var_file: terraform-vars/terraform-aws.tfvars.yml
-      terraform_source: penguin-ci//infrastructure
+      terraform_source: terraforming-aws-penguin//infrastructure
       delete_on_failure: true
       env_name: {{env_name}}
 
