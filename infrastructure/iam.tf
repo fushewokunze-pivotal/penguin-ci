@@ -1,3 +1,12 @@
+resource "aws_iam_user" "ert_iam_user" {
+  name = "${var.env_name}_ert_iam_user"
+}
+
+resource "aws_iam_access_key" "ert_iam_user_access_key" {
+  user = "${aws_iam_user.ert_iam_user.name}"
+}
+
+
 resource "aws_iam_user" "aws_service_broker_iam_user" {
   name = "${var.env_name}_aws_service_broker_iam_user"
 }

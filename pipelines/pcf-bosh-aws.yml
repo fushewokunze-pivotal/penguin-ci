@@ -258,7 +258,6 @@ jobs:
       delete_on_failure: true
       env_name: {{env_name}}
 
-
 - name: deploy-director
   plan:
   - aggregate:
