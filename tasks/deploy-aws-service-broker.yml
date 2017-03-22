@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: { repository: pcfbosh/minimal }
+
+inputs:
+- name: pcf-bosh-ci
+- name: penguin-ci
+- name: bosh-vars-store 
+- name: terraform-state
+- name: aws-sb-vars-store
+
+outputs:
+- name: new-aws-sb-vars-store
+
+run:
+path: penguin-ci/tasks/deploy-aws-service-broker.sh
