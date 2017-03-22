@@ -1,0 +1,734 @@
+---
+name: aws-services
+releases:
+- name: aws-services
+  url: https://s3-us-west-1.amazonaws.com/aws-service-broker/aws-services-145.tgz
+  sha1: 0f1ff5fff3704fae695a9cc7988deb86f1d3a4b8
+  version: '145'
+stemcells:
+- alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  os: ubuntu-trusty
+  version: '3312.20'
+instance_groups:
+- name: deploy-errand
+  azs:
+  - z1
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: deploy-broker
+    release: aws-services
+    consumes: {}
+    provides: {}
+  vm_type: t2.small
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    cf:
+      admin_username: admin
+      admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+      ha_proxy:
+        skip_cert_verify: false
+      system_api_url: https://api.((system_domain))
+      system_domain: ((system_domain))
+    aws_broker:
+      cf:
+        instances: 2
+      policy_name: PCFInstallationPolicy
+      rds:
+        EnableStorageEncryption: true
+        SubnetGroupName: 
+        VpcSecurityGroupIds: 
+        PubliclyAccessible: true
+        MasterUsername: masterusername
+        MasterPasswordSalt: ((rds_master_password))
+        InstancePrefix: cf
+        ServiceKeyPolicyName: PCFAppDeveloperPolicy-rds
+        Services:
+        - id: 502512f8-f158-4e3f-a4d8-d71b61b395cb
+          description: Create and manage AWS RDS PostgreSQL deployments
+          bindable: true
+          name: aws-rds-postgres
+          public: true
+          metadata:
+            displayName: AWS RDS for PostgreSQL
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/rds/postgresql/
+            longDescription: |
+              Deploy scalable PostgreSQL deployments in minutes with cost-efficient and resizable hardware capacity
+          plans:
+          - guid: ed632369-9fe6-4f88-b823-94f0a03b0c34
+            name: basic
+            description: For small projects and during development.
+            free: false
+            bullets: "Shared processor\r\nSSD storage\r\nNo redundancy\r\n"
+            CreateDBInstance_Engine: postgres
+            CreateDBInstance_EngineVersion: 9.4.5
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.t2.micro
+            CreateDBInstance_MultiAZ: false
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 10
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 
+            CreateDBInstance_BackupRetentionPeriod: 0
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, UPDATE, INSERT, DELETE, DROP,
+              ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: 0f62a6f9-afd0-405f-bc94-928db8eec9c2
+            name: standard
+            description: For a small production database, multi-AZ, 2vCPU, 7.5GB
+            free: false
+            bullets: "Two processors\r\nMulti-AZ redundancy\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: postgres
+            CreateDBInstance_EngineVersion: 9.4.5
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.large
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 100
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, UPDATE, INSERT, DELETE, DROP,
+              ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: 57a740ed-d919-4c2c-8d82-77e6b4628a5e
+            name: premium
+            description: For a mid-sized database, multi-AZ, 4 vCPU, 15GB
+            free: false
+            bullets: "Four processors\r\nMulti-AZ redundancy\r\nMedium production
+              instance\r\n"
+            CreateDBInstance_Engine: postgres
+            CreateDBInstance_EngineVersion: 9.4.5
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 200
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, UPDATE, INSERT, DELETE, DROP,
+              ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: fcdd1390-dbe0-4492-bda4-083420d48243
+            name: enterprise
+            description: For a large database, multi-AZ, 8 vCPU, 32GB
+            free: false
+            bullets: "Eight processors\r\nMulti-AZ redundancy\r\nLarge production
+              instance\r\n"
+            CreateDBInstance_Engine: postgres
+            CreateDBInstance_EngineVersion: 9.4.5
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.2xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 500
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 3000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, UPDATE, INSERT, DELETE, DROP,
+              ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+        - id: d5fb979f-8752-4943-b484-d6bb8e1d93d8
+          description: Create and manage AWS RDS MySQL deployments
+          bindable: true
+          name: aws-rds-mysql
+          public: true
+          metadata:
+            displayName: AWS RDS for MySQL
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/rds/mysql/
+            longDescription: |
+              Deploy scalable MySQL deployments in minutes with cost-efficient and resizable hardware capacity
+          plans:
+          - guid: 6727d614-0333-4a54-9de7-37cac093a2e2
+            name: basic
+            description: For small projects and during development.
+            free: false
+            bullets: "Shared processor\r\nSSD storage\r\nNo redundancy\r\n"
+            CreateDBInstance_Engine: mysql
+            CreateDBInstance_EngineVersion: 5.6.27
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.t2.micro
+            CreateDBInstance_MultiAZ: false
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 10
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 
+            CreateDBInstance_BackupRetentionPeriod: 0
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: f9da7944-8b7c-4b4b-bf99-38a0638fe55c
+            name: standard
+            description: For a small production database, multi-AZ, 2vCPU, 7.5GB
+            free: false
+            bullets: "Two processors\r\nMulti-AZ redundancy\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: mysql
+            CreateDBInstance_EngineVersion: 5.6.27
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.large
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 100
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: facf44eb-51b1-4596-b1c8-57ec8886333f
+            name: premium
+            description: For a mid-sized database, multi-AZ, 4 vCPU, 15GB
+            free: false
+            bullets: "Four processors\r\nMulti-AZ redundancy\r\nMedium production
+              instance\r\n"
+            CreateDBInstance_Engine: mysql
+            CreateDBInstance_EngineVersion: 5.6.27
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 200
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: f3154fb5-d936-48a7-8b6c-1d63bfca26a6
+            name: enterprise
+            description: For a large database, multi-AZ, 8 vCPU, 32GB
+            free: false
+            bullets: "Eight processors\r\nMulti-AZ redundancy\r\nLarge production
+              instance\r\n"
+            CreateDBInstance_Engine: mysql
+            CreateDBInstance_EngineVersion: 5.6.27
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.2xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 500
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 3000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+        - id: 7f0bb85a-0bb0-41f3-9381-961c6b9a91a6
+          description: Create and manage AWS RDS MariaDB deployments
+          bindable: true
+          name: aws-rds-mariadb
+          public: true
+          metadata:
+            displayName: AWS RDS for MariaDB
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/rds/mariadb/
+            longDescription: |
+              Deploy scalable MariaDB deployments in minutes with cost-efficient and resizable hardware capacity
+          plans:
+          - guid: d9259777-935b-4346-84e8-d5415fa7ec69
+            name: basic
+            description: For small projects and during development.
+            free: false
+            bullets: "Shared processor\r\nSSD storage\r\nNo redundancy\r\n"
+            CreateDBInstance_Engine: mariadb
+            CreateDBInstance_EngineVersion: 10.0.24
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.t2.micro
+            CreateDBInstance_MultiAZ: false
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 10
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 
+            CreateDBInstance_BackupRetentionPeriod: 0
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: bbe26a5c-a091-41c2-945d-075587e6ee75
+            name: standard
+            description: For a small production database, multi-AZ, 2vCPU, 7.5GB
+            free: false
+            bullets: "Two processors\r\nMulti-AZ redundancy\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: mariadb
+            CreateDBInstance_EngineVersion: 10.0.24
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.large
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 100
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: 1e5f1d6a-dfa4-4f68-b12f-91b1b4707706
+            name: premium
+            description: For a mid-sized database, multi-AZ, 4 vCPU, 15GB
+            free: false
+            bullets: "Four processors\r\nMulti-AZ redundancy\r\nMedium production
+              instance\r\n"
+            CreateDBInstance_Engine: mariadb
+            CreateDBInstance_EngineVersion: 10.0.24
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 200
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: 19fe8c43-4041-485d-b00a-6ea607e08cf7
+            name: enterprise
+            description: For a large database, multi-AZ, 8 vCPU, 32GB
+            free: false
+            bullets: "Eight processors\r\nMulti-AZ redundancy\r\nLarge production
+              instance\r\n"
+            CreateDBInstance_Engine: mariadb
+            CreateDBInstance_EngineVersion: 10.0.24
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.2xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_StorageEncrypted: false
+            CreateDBInstance_AllocatedStorage: 500
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 3000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+        - id: b9f2d3a0-a9a6-4396-b98e-9841fd0c06ba
+          description: Create and manage AWS RDS Aurora deployments
+          bindable: true
+          name: aws-rds-aurora
+          public: true
+          metadata:
+            displayName: AWS RDS for Aurora
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/rds/aurora/
+            longDescription: |
+              Deploy scalable Aurora deployments in minutes with cost-efficient and resizable hardware capacity
+          plans:
+          - guid: 60415cab-4514-437a-81ac-d54a1e06820e
+            name: basic
+            description: For small projects and during development. 2 vCPU, 15GB
+            free: false
+            bullets: "Two processors\r\nSmall instance\r\nNo backups\r\n"
+            CreateDBInstance_Engine: aurora
+            CreateDBInstance_EngineVersion: 5.6.10a
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.r3.large
+            CreateDBInstance_BackupRetentionPeriod: 1
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_StorageEncrypted: false
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: 1fb34fbf-19cf-4c38-97fd-1d45614966b0
+            name: standard
+            description: For a small production database, 4 vCPU, 30.5GB
+            free: false
+            bullets: "Four processors\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: aurora
+            CreateDBInstance_EngineVersion: 5.6.10a
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.r3.xlarge
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_StorageEncrypted: false
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: b2a7e941-2042-42a4-8895-d554e5c7f686
+            name: premium
+            description: For a mid-sized database, 8 vCPU, 61GB
+            free: false
+            bullets: "Eight processors\r\nMedium production instance\r\n"
+            CreateDBInstance_Engine: aurora
+            CreateDBInstance_EngineVersion: 5.6.10a
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.r3.2xlarge
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_StorageEncrypted: false
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+          - guid: 73abaa02-1825-4c19-97c8-3f21c7736873
+            name: enterprise
+            description: For a large database, 16 vCPU, 122GB
+            free: false
+            bullets: "Sixteen processors\r\nLarge production instance\r\n"
+            CreateDBInstance_Engine: aurora
+            CreateDBInstance_EngineVersion: 5.6.10a
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.r3.4xlarge
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_StorageEncrypted: false
+            CreateUserPrivileges_Grants: CREATE, SELECT, INSERT, UPDATE, DELETE, EXECUTE,
+              DROP, LOCK TABLES, ALTER, INDEX
+            CreateDBInstance_DBParameterGroupName: 
+        - id: dbc23619-a2ea-4f51-991b-cf882749b1b7
+          description: Create and manage AWS RDS SQL Server deployments
+          bindable: true
+          name: aws-rds-sqlserver
+          public: true
+          metadata:
+            displayName: AWS RDS for SQL Server
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/rds/sqlserver/
+            longDescription: |
+              Deploy scalable SQL Server deployments in minutes with cost-efficient and resizable hardware capacity
+          plans:
+          - guid: cd0001a9-b7b1-49e4-8f2e-7d70c97ec588
+            name: basic
+            description: For small projects and during development. 1 vCPU, 1GB
+            free: false
+            bullets: "One processor\r\nSmall instance\r\nNo backups\r\n"
+            CreateDBInstance_Engine: sqlserver-ex
+            CreateDBInstance_EngineVersion: 12.00.4422.0.v1
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.t2.micro
+            CreateDBInstance_AllocatedStorage: 20
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 
+            CreateDBInstance_BackupRetentionPeriod: 0
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: license-included
+            CreateDBInstance_StorageEncrypted: false
+          - guid: 6d556ea4-e123-44bf-b23f-53931649273a
+            name: standard
+            description: For a small production database, 2 vCPU, 8GB
+            free: false
+            bullets: "Two processors\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: sqlserver-web
+            CreateDBInstance_EngineVersion: 12.00.4422.0.v1
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.large
+            CreateDBInstance_AllocatedStorage: 20
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: license-included
+            CreateDBInstance_StorageEncrypted: false
+          - guid: 3d9f61c1-0736-4d65-bd01-e98da7d3d0f9
+            name: premium
+            description: For a medium production database, 2 vCPU, 8GB
+            free: false
+            bullets: "Two processors\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: sqlserver-se
+            CreateDBInstance_EngineVersion: 12.00.4422.0.v1
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.large
+            CreateDBInstance_AllocatedStorage: 200
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: license-included
+            CreateDBInstance_StorageEncrypted: false
+          - guid: 60cc0871-2fd8-43cf-b2a2-7346bf0e9d9a
+            name: enterprise
+            description: For a large database, 4 vCPU, 16GB
+            free: false
+            bullets: "Four processors\r\nLarge production instance\r\n"
+            CreateDBInstance_Engine: sqlserver-se
+            CreateDBInstance_EngineVersion: 11.00.6020.0.v1
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.xlarge
+            CreateDBInstance_AllocatedStorage: 500
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 3000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: license-included
+            CreateDBInstance_StorageEncrypted: false
+        - id: ec71e5fe-fd72-4b6a-945d-01623af3265b
+          description: Create and manage AWS RDS Oracle deployments
+          bindable: true
+          name: aws-rds-oracle
+          public: true
+          metadata:
+            displayName: AWS RDS for Oracle
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/rds/oracle/
+            longDescription: |
+              Deploy scalable Oracle deployments in minutes with cost-efficient and resizable hardware capacity
+          plans:
+          - guid: 4fcbcaca-44ed-47ab-afc5-d395fdce1626
+            name: basic
+            description: For small projects and during development.
+            free: false
+            bullets: "Shared processor\r\nSSD storage\r\nNo redundancy\r\n"
+            CreateDBInstance_Engine: oracle-se2
+            CreateDBInstance_EngineVersion: 12.1.0.2.v3
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.t2.micro
+            CreateDBInstance_MultiAZ: false
+            CreateDBInstance_AllocatedStorage: 10
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 
+            CreateDBInstance_BackupRetentionPeriod: 0
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: bring-your-own-license
+            CreateDBInstance_StorageEncrypted: false
+          - guid: 9af04c5a-f5b1-4812-8230-f08d23d9c066
+            name: standard
+            description: For a small production database, multi-AZ, 2vCPU, 8GB
+            free: false
+            bullets: "Two processors\r\nMulti-AZ redundancy\r\nSmall production instance\r\n"
+            CreateDBInstance_Engine: oracle-se2
+            CreateDBInstance_EngineVersion: 12.1.0.2.v3
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.large
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_AllocatedStorage: 100
+            CreateDBInstance_StorageType: gp2
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: bring-your-own-license
+            CreateDBInstance_StorageEncrypted: false
+          - guid: acea2136-c29b-4b3c-a698-508b1a016424
+            name: premium
+            description: For a mid-sized database, multi-AZ, 4 vCPU, 16GB
+            free: false
+            bullets: "Four processors\r\nMulti-AZ redundancy\r\nMedium production
+              instance\r\n"
+            CreateDBInstance_Engine: oracle-se2
+            CreateDBInstance_EngineVersion: 12.1.0.2.v3
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_AllocatedStorage: 200
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 1000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: bring-your-own-license
+            CreateDBInstance_StorageEncrypted: false
+          - guid: f6016c4c-a0a8-4e58-b621-8d9325d52961
+            name: enterprise
+            description: For a large database, multi-AZ, 8 vCPU, 32GB
+            free: false
+            bullets: "Eight processors\r\nMulti-AZ redundancy\r\nLarge production
+              instance\r\n"
+            CreateDBInstance_Engine: oracle-ee
+            CreateDBInstance_EngineVersion: 12.1.0.2.v3
+            CreateDBInstance_CopyTagsToSnapshot: true
+            CreateDBInstance_DBInstanceClass: db.m4.2xlarge
+            CreateDBInstance_MultiAZ: true
+            CreateDBInstance_AllocatedStorage: 500
+            CreateDBInstance_StorageType: io1
+            CreateDBInstance_Iops: 3000
+            CreateDBInstance_BackupRetentionPeriod: 7
+            CreateDBInstance_PreferredBackupWindow: 
+            CreateDBInstance_LicenseModel: bring-your-own-license
+            CreateDBInstance_StorageEncrypted: false
+        ServiceProperties:
+          502512f8-f158-4e3f-a4d8-d71b61b395cb:
+            DefaultRegion: us-west-1
+            DefaultAvailabilityZone: 
+          d5fb979f-8752-4943-b484-d6bb8e1d93d8:
+            DefaultRegion: us-west-1
+            DefaultAvailabilityZone: 
+          7f0bb85a-0bb0-41f3-9381-961c6b9a91a6:
+            DefaultRegion: us-west-1
+            DefaultAvailabilityZone: 
+          b9f2d3a0-a9a6-4396-b98e-9841fd0c06ba:
+            DefaultRegion: us-west-1
+            DefaultAvailabilityZone: 
+          dbc23619-a2ea-4f51-991b-cf882749b1b7:
+            DefaultRegion: us-west-1
+            DefaultAvailabilityZone: 
+          ec71e5fe-fd72-4b6a-945d-01623af3265b:
+            DefaultRegion: us-west-1
+            DefaultAvailabilityZone: 
+      sqs:
+        ServiceKeyPolicyName: PCFAppDeveloperPolicy-sqs
+        Services:
+        - id: 9e182926-6eee-4cf6-b19c-0d8adef2a914
+          description: Create and manage Amazon SQS queues
+          bindable: true
+          name: aws-sqs
+          public: true
+          metadata:
+            displayName: AWS Simple Queue Service (SQS)
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/sqs/
+            longDescription: |
+              Amazon Simple Queue Service (SQS) is a fast, reliable, scalable, fully managed message queuing service.
+          plans:
+          - id: 95e92b64-2030-4f60-a4f3-4f2dbe97769e
+            name: standard
+            description: Amazon Simple Queue Service
+            free: false
+            bullets: 
+        ServiceProperties:
+          9e182926-6eee-4cf6-b19c-0d8adef2a914:
+            DefaultRegion: us-west-1
+            InstancePrefix: cf
+        PlanProperties:
+          95e92b64-2030-4f60-a4f3-4f2dbe97769e:
+            CreateQueue:
+              Attributes:
+                DelaySeconds: 0
+                MaximumMessageSize: 262144
+                MessageRetentionPeriod: 345600
+                ReceiveMessageWaitTimeSeconds: 0
+                RedrivePolicy: 
+                VisibilityTimeout: 30
+      s3:
+        ServiceKeyPolicyName: PCFAppDeveloperPolicy-s3
+        Services:
+        - id: d22bd490-2942-427e-a2ed-4e3135cf20f4
+          description: Create and manage Amazon S3 buckets
+          bindable: true
+          name: aws-s3
+          public: true
+          metadata:
+            displayName: AWS Simple Storage Service (S3)
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/s3/
+            longDescription: |
+              Amazon Simple Storage Service (Amazon S3), provides developers and IT teams with secure, durable, highly-scalable cloud storage.
+          plans:
+          - id: 7091734e-67cb-4cf3-87a1-6366eae8d286
+            name: standard
+            description: Amazon Simple Storage Service is storage for the Internet.
+            free: false
+            bullets: |
+              Secure
+              Durable
+              Highly-scalable
+        ServiceProperties:
+          d22bd490-2942-427e-a2ed-4e3135cf20f4:
+            DefaultRegion: us-west-1
+            InstancePrefix: cf
+        PlanProperties:
+          7091734e-67cb-4cf3-87a1-6366eae8d286:
+            CreateBucket: {}
+      dynamodb:
+        ServiceKeyPolicyName: PCFAppDeveloperPolicy-dynamodb
+        Services:
+        - id: c8ea63d4-696e-43f6-b500-27ed734190a6
+          description: Create and manage Amazon DynamoDB tables
+          bindable: true
+          name: aws-dynamodb
+          public: true
+          metadata:
+            displayName: AWS DynamoDB
+            providerDisplayName: Amazon Web Services, Inc.
+            documentationUrl: https://aws.amazon.com/dynamodb/
+            longDescription: |
+              Amazon DynamoDB is a fast and flexible NoSQL database service for all applications that need consistent, single-digit millisecond latency at any scale
+          plans:
+          - id: 5432720a-4166-4f26-90ae-f6217e36c158
+            name: standard
+            description: Create AWS DynamoDB tables
+            free: false
+            bullets: |
+              Key-value Data Model Support
+              Seamless Scaling
+              High Availability
+              Develop Locally, Scale Globally
+        ServiceProperties:
+          c8ea63d4-696e-43f6-b500-27ed734190a6:
+            DefaultRegion: us-west-1
+      server:
+        Store:
+          Driver: mysql
+          RootCert: 
+          User: admin
+          Password: ((mysql_admin_password))
+          Host: ((mysql_host))
+          Port: 3306
+          Database: aws_service_broker
+          Certificate: 
+        Quotas:
+          c8ea63d4-696e-43f6-b500-27ed734190a6: 100
+          502512f8-f158-4e3f-a4d8-d71b61b395cb: 100
+          d5fb979f-8752-4943-b484-d6bb8e1d93d8: 100
+          7f0bb85a-0bb0-41f3-9381-961c6b9a91a6: 100
+          dbc23619-a2ea-4f51-991b-cf882749b1b7: 100
+          b9f2d3a0-a9a6-4396-b98e-9841fd0c06ba: 100
+          ec71e5fe-fd72-4b6a-945d-01623af3265b: 100
+          d22bd490-2942-427e-a2ed-4e3135cf20f4: 100
+          9e182926-6eee-4cf6-b19c-0d8adef2a914: 100
+        AWS:
+          Endpoint: 
+          IAMEndpoint: 
+          CustomCACert: 
+          DefaultRegion: us-west-1
+          DefaultAvailabilityZone: 
+          AccessKeyId: ((aws_access_key_id))
+          SecretAccessKey: ((aws_secret_access_key_id))
+          ServiceKeyTimeout: 60
+          Tags:
+            _internal: 
+            aws_broker: ((aws_access_key_id))
+        BrokerUsername: broker
+        BrokerPassword: ((broker_password))
+        LogLevel: DEBUG
+
+  update:
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+- name: delete-errand
+  azs:
+  - z1
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: delete-broker
+    release: aws-services
+    consumes: {}
+    provides: {}
+  vm_type: t2.small
+  stemcell: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
+  properties:
+    cf:
+      admin_username: admin
+      admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+      ha_proxy:
+        skip_cert_verify: false
+      system_api_url: https://api.((system_domain))
+      system_domain: ((system_domain))
+
+  update:
+    max_in_flight: 1
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 1
+  max_errors: 2
+  serial: true
