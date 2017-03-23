@@ -13,7 +13,7 @@ system_domain: $(jq -r .sys_domain terraform-state/metadata)
 mysql_admin_password: $(jq -r .rds_username terraform-state/metadata)
 mysql_host: $(jq -r .rds_address terraform-state/metadata)
 aws_access_key_id: $(jq -r .bosh_iam_user_access_key terraform-state/metadata)
-aws_secret_access_key_id: $(jq -r .bosh_iam_user_access_key terraform-state/metadata)
+aws_secret_access_key_id: $(jq -r .bosh_iam_user_secret_access_key terraform-state/metadata)
 skip_ssl_validation: true
 AWSSBVARS
 
