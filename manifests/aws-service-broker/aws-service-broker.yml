@@ -1,5 +1,5 @@
 ---
-name: aws-services
+name: aws-service-broker
 releases:
 - name: aws-services
   url: https://s3-us-west-1.amazonaws.com/aws-service-broker/aws-services-145.tgz
