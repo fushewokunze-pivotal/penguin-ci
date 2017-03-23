@@ -5,7 +5,7 @@ releases:
   url: https://s3-us-west-1.amazonaws.com/aws-service-broker/aws-services-145.tgz
   sha1: 0f1ff5fff3704fae695a9cc7988deb86f1d3a4b8
   version: '145'
-stemcells:
+stemcells: 
 - alias: bosh-aws-xen-hvm-hvm-ubuntu-trusty-go_agent
   os: ubuntu-trusty
   version: '3312.20'
