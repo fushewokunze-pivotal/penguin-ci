@@ -25,7 +25,7 @@ instance_groups:
   properties:
     cf:
       admin_username: admin
-      admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+      admin_password: ((/aws-director-credhub/cf/uaa_scim_users_admin_password))
       ha_proxy:
         skip_cert_verify: true
       system_api_url: https://api.((system_domain))
@@ -712,7 +712,7 @@ instance_groups:
   properties:
     cf:
       admin_username: admin
-      admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
+      admin_password: ((/aws-director-credhub/cf/uaa_scim_users_admin_password))
       ha_proxy:
         skip_cert_verify: true
       system_api_url: https://api.((system_domain))
