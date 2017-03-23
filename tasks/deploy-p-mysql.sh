@@ -39,9 +39,13 @@ bosh -n interpolate p-mysql-vars-template.yml \
 
 cp mysql-vars-store/*-mysql-vars-store.yml new-mysql-vars-store/mysql-vars-store.yml
 
+# TODO hack.. move to task
+bosh upload stemcell https://d26ekeud912fhb.cloudfront.net/bosh-stemcell/aws/light-bosh-stemcell-3263.21-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
+
 bosh -n deploy penguin-ci/manifests/mysql/p-mysql.yml \
   --deployment p-mysql \
   --vars-file p-mysql-vars.yml 
 
+# TODO hack.. move to task
 bosh run-errand broker-registrar -d p-mysql
 
