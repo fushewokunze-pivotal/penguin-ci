@@ -27,7 +27,7 @@ instance_groups:
       admin_username: admin
       admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       ha_proxy:
-        skip_cert_verify: false
+        skip_cert_verify: true
       system_api_url: https://api.((system_domain))
       system_domain: ((system_domain))
     aws_broker:
@@ -714,7 +714,7 @@ instance_groups:
       admin_username: admin
       admin_password: ((/aws-director-credhub/cf/push_apps_manager_password))
       ha_proxy:
-        skip_cert_verify: false
+        skip_cert_verify: true
       system_api_url: https://api.((system_domain))
       system_domain: ((system_domain))
 
