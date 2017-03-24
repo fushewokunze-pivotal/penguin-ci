@@ -20,7 +20,7 @@
       release: loggregator
       consumes: {}
       provides: {}
-    vm_type: micro
+    vm_type: t2.micro
     stemcell: default
     properties:
       request_timeout_in_seconds: 900
