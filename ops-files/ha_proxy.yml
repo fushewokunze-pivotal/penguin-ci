@@ -72,11 +72,7 @@
         ca_cert: "((consul_agent.ca))"
         server_cert: "((consul_server.certificate))"
         server_key: "((consul_server.private_key))"
-        
-        agent:
-          domain: cf.internal
-
-
+ 
     networks:
     - name: private
       static_ips:
