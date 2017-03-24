@@ -27,7 +27,7 @@
       ha_proxy:
         disable_http: true
         ssl_ciphers: 
-        ssl_pem:  "((ha_proxy_ssl.certificate)) \r\n ((ha_proxy_ssl.private_key))"
+        ssl_pem:  "((ha_proxy_ssl.certificate))((ha_proxy_ssl.private_key))"
         buffer_size_bytes: 16384
       router:
         servers:
