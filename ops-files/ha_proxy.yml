@@ -73,7 +73,7 @@
     networks:
     - name: private
       static_ips:
-      - 10.0.0.253
+      - 10.0.4.253
 
 - type: replace
   path: /variables/-
