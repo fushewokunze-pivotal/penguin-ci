@@ -52,6 +52,11 @@
         machines:
         - ((nats_ip))
       loggregator:
+        tls:
+          ca_cert: "((loggregator_tls_metron.ca))"
+          metron:
+            cert: "((loggregator_tls_metron.certificate))"
+            key: "((loggregator_tls_metron.private_key))"
         etcd:
           require_ssl: true
           ca_cert: "((etcd_server.ca))"
