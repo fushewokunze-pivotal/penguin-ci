@@ -21,6 +21,8 @@
       consumes: {}
       provides: {}
     vm_type: t2.small
+    vm_extensions:
+    - cf-internet-required
     stemcell: default
     properties:
       request_timeout_in_seconds: 900
