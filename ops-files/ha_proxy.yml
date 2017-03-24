@@ -22,12 +22,12 @@
       provides: {}
     vm_type: t2.small
     vm_extensions:
-    - cf-internet-required
+    - ha_proxy
     stemcell: default
     properties:
       request_timeout_in_seconds: 900
       ha_proxy:
-        disable_http: true
+        disable_http: false
         ssl_ciphers: 
         ssl_pem:  "((ha_proxy_ssl.certificate))((ha_proxy_ssl.private_key))"
         buffer_size_bytes: 16384
@@ -85,9 +85,10 @@
         server_key: "((consul_server.private_key))"
 
     networks:
-    - name: private
-      static_ips:
-      - 10.0.4.253
+    - name: public
+      default: [dns, gateway]
+    - name: vip
+      static_ips: [50.18.208.252]  
 
 - type: replace
   path: /variables/-
