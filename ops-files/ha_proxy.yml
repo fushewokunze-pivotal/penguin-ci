@@ -69,7 +69,9 @@
           domain: cf.internal
           servers:
             lan:
-            - ((consul_ips))
+            - 10.0.4.194
+            - 10.0.5.195
+            - 10.0.6.196
 
         encrypt_keys:
         - "((consul_encrypt_key))"
