@@ -1,0 +1,79 @@
+---
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: ha_proxy
+    azs:
+    - z1
+    instances: 1
+    lifecycle: service
+    jobs:
+    - name: consul_agent
+      release: consul
+      consumes: {}
+      provides: {}
+    - name: haproxy
+      release: cf
+      consumes: {}
+      provides: {}
+    - name: metron_agent
+      release: loggregator
+      consumes: {}
+      provides: {}
+    vm_type: micro
+    stemcell: default
+    properties:
+      request_timeout_in_seconds: 900
+      ha_proxy:
+        disable_http: true
+        ssl_ciphers: 
+        ssl_pem:  "((ha_proxy_ssl_pem.certificate))"
+          "((ha_proxy_ssl_pem.private_key))"
+        buffer_size_bytes: 16384
+      router:
+        servers:
+        - router.service.cf.internal
+      cc:
+        allow_app_ssh_access: true
+      syslog_daemon_config:
+        address: 
+        port: 
+        transport: 
+      metron_agent:
+        deployment: cf
+        etcd:
+          client_cert: "((etcd_client.certificate))"
+          client_key: "((etcd_client.private_key))"
+      metron_endpoint:
+        shared_secret: "((dropsonde_shared_secret))" 
+      nats:
+        user: nats
+        password: "((nats_password))"
+        port: 4222
+        machines:
+        - ((nats_ip))
+      loggregator:
+        etcd:
+          require_ssl: true
+          ca_cert: "((etcd_server.ca))"
+          machines:
+            - etcd.service.cf.internal
+
+      consul:
+        agent:
+          mode: server
+          domain: cf.internal
+        encrypt_keys:
+        - "((consul_encrypt_key))"
+        agent_cert: "((consul_agent.certificate))"
+        agent_key: "((consul_agent.private_key))"
+        ca_cert: "((consul_agent.ca))"
+        server_cert: "((consul_server.certificate))"
+        server_key: "((consul_server.private_key))"
+
+    networks:
+    - name: private
+      static_ips:
+      - 10.0.0.254
+      - 10.0.0.253
+    
