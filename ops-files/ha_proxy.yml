@@ -75,4 +75,30 @@
       static_ips:
       - 10.0.0.254
       - 10.0.0.253
-    
+
+- type: replace
+  path: /variables/-
+  value:   
+    name: default_ca
+    type: ha_proxy_ssl_ca
+    options:
+      is_ca: true
+      common_name: ca 
+
+- type: replace
+  path: /variables/-
+  value: 
+    name: ha_proxy_ssl
+    type: certificate
+    options:
+      ca: ha_proxy_ssl_ca
+      common_name: ((system_domain))
+      alternative_names: 
+      - apps.((system_domain))
+      - *.apps.((system_domain))
+      - *.sys.((system_domain))
+      - sys.((system_domain))
+      - uaa.sys.((system_domain))
+      - *.uaa.sys.((system_domain))
+      - login.sys.((system_domain))
+      - *.login.sys.((system_domain))
