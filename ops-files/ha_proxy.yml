@@ -73,7 +73,6 @@
     networks:
     - name: private
       static_ips:
-      - 10.0.0.254
       - 10.0.0.253
 
 - type: replace
