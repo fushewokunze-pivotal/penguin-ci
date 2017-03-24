@@ -31,7 +31,8 @@
         buffer_size_bytes: 16384
       router:
         servers:
-        - router.service.cf.internal
+        - 10.0.4.5
+        - 10.0.5.5
       cc:
         allow_app_ssh_access: true
       syslog_daemon_config:
