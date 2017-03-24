@@ -20,14 +20,14 @@
       release: loggregator
       consumes: {}
       provides: {}
-    vm_type: t2.micro
+    vm_type: t2.small
     stemcell: default
     properties:
       request_timeout_in_seconds: 900
       ha_proxy:
         disable_http: true
         ssl_ciphers: 
-        ssl_pem:  "((ha_proxy_ssl_pem.certificate)) \r\n ((ha_proxy_ssl_pem.private_key))"
+        ssl_pem:  "((ha_proxy_ssl.certificate)) \r\n ((ha_proxy_ssl.private_key))"
         buffer_size_bytes: 16384
       router:
         servers:
@@ -50,8 +50,13 @@
         password: "((nats_password))"
         port: 4222
         machines:
-        - ((nats_ips))
+        - ((nats_ip))
       loggregator:
+        tls:
+          ca_cert: "((loggregator_tls_metron.ca))"
+          metron:
+            cert: "((loggregator_tls_metron.certificate))"
+            key: "((loggregator_tls_metron.private_key))"
         etcd:
           require_ssl: true
           ca_cert: "((etcd_server.ca))"
@@ -65,6 +70,7 @@
           servers:
             lan:
             - ((consul_ips))
+
         encrypt_keys:
         - "((consul_encrypt_key))"
         agent_cert: "((consul_agent.certificate))"
@@ -72,21 +78,20 @@
         ca_cert: "((consul_agent.ca))"
         server_cert: "((consul_server.certificate))"
         server_key: "((consul_server.private_key))"
- 
+
     networks:
     - name: private
       static_ips:
-      - 10.0.0.254
-      - 10.0.0.253
+      - 10.0.4.253
 
 - type: replace
   path: /variables/-
   value:   
-    name: default_ca
-    type: ha_proxy_ssl_ca
+    name: ha_proxy_ssl_ca
+    type: certificate
     options:
       is_ca: true
-      common_name: ca 
+      common_name: haproxysslCA 
 
 - type: replace
   path: /variables/-
@@ -97,11 +102,11 @@
       ca: ha_proxy_ssl_ca
       common_name: ((system_domain))
       alternative_names: 
-      - apps.((system_domain))
-      - *.apps.((system_domain))
-      - *.sys.((system_domain))
-      - sys.((system_domain))
-      - uaa.sys.((system_domain))
-      - *.uaa.sys.((system_domain))
-      - login.sys.((system_domain))
-      - *.login.sys.((system_domain))
+      - "apps.((system_domain))"
+      - "*.apps.((system_domain))"
+      - "*.sys.((system_domain))"
+      - "sys.((system_domain))"
+      - "uaa.sys.((system_domain))"
+      - "*.uaa.sys.((system_domain))"
+      - "login.sys.((system_domain))"
+      - "*.login.sys.((system_domain))"
