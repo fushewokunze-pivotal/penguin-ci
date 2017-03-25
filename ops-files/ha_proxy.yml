@@ -209,7 +209,7 @@ vm_extensions:
 - name: ha_proxy
   cloud_properties:
     security_groups: 
-    - web
+    - stack-penguin-upgrade-CFRouterSecurityGroup-OFGUX9QYH597
     - bosh_security_group
     
     
