@@ -1,215 +1,118 @@
-azs:
-- name: z1
-  cloud_properties:
-    availability_zone: ((z1))
-- name: z2
-  cloud_properties:
-    availability_zone: ((z2))
-- name: z3
-  cloud_properties:
-    availability_zone: us-west-1a
-- name: services
-  cloud_properties:
-    availability_zone: us-west-1a
+---
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: ha_proxy
+    azs:
+    - z1
+    instances: 1
+    lifecycle: service
+    jobs:
+    - name: consul_agent
+      release: consul
+      consumes: {}
+      provides: {}
+    - name: haproxy
+      release: cf
+      consumes: {}
+      provides: {}
+    - name: metron_agent
+      release: loggregator
+      consumes: {}
+      provides: {}
+    vm_type: t2.small
+    vm_extensions:
+    - ha_proxy
+    stemcell: default
+    properties:
+      request_timeout_in_seconds: 900
+      ha_proxy:
+        disable_http: false
+        ssl_ciphers: 
+        ssl_pem:  "((ha_proxy_ssl.certificate))((ha_proxy_ssl.private_key))"
+        buffer_size_bytes: 16384
+      router:
+        servers:
+        - 10.0.4.5
+        - 10.0.5.5
+      cc:
+        allow_app_ssh_access: true
+      syslog_daemon_config:
+        address: 
+        port: 
+        transport: 
+      metron_agent:
+        deployment: cf
+        etcd:
+          client_cert: "((etcd_client.certificate))"
+          client_key: "((etcd_client.private_key))"
+      metron_endpoint:
+        shared_secret: "((dropsonde_shared_secret))" 
+      nats:
+        user: nats
+        password: "((nats_password))"
+        port: 4222
+        machines:
+        - ((nats_ip))
+      loggregator:
+        tls:
+          ca_cert: "((loggregator_tls_metron.ca))"
+          metron:
+            cert: "((loggregator_tls_metron.certificate))"
+            key: "((loggregator_tls_metron.private_key))"
+        etcd:
+          require_ssl: true
+          ca_cert: "((etcd_server.ca))"
+          machines:
+            - etcd.service.cf.internal
 
-vm_types:
-- name: m3.medium
-  cloud_properties:
-    instance_type: m3.medium
-    ephemeral_disk:
-      size: 1024
-      type: gp2
-      encrypted: true
-- name: m3.large
-  cloud_properties:
-    instance_type: m3.large
-    ephemeral_disk:
-      size: 1024
-      type: gp2
-      encrypted: true
-- name: c3.large
-  cloud_properties:
-    instance_type: c3.large
-    ephemeral_disk:
-      size: 1024
-      type: gp2
-      encrypted: true
-- name: r3.xlarge
-  cloud_properties:
-    instance_type: r3.xlarge
-    ephemeral_disk:
-      size: 1024
-      type: gp2
-      encrypted: true
-- name: t2.small
-  cloud_properties:
-    instance_type: t2.small
-    ephemeral_disk:
-      size: 1024
-      type: gp2
-      encrypted: true
+      consul:
+        agent:
+          mode: server
+          domain: cf.internal
+          servers:
+            lan:
+            - 10.0.4.194
+            - 10.0.5.195
+            - 10.0.6.196
 
-disk_types:
-- name: 1GB
-  disk_size: 1024
-  cloud_properties:
-    type: gp2
-    encrypted: true
-- name: 5GB
-  disk_size: 5120
-  cloud_properties:
-    type: gp2
-    encrypted: true
-- name: 10GB
-  disk_size: 10240
-  cloud_properties:
-    type: gp2
-    encrypted: true
-- name: 50GB
-  disk_size: 51200
-  cloud_properties:
-    type: gp2
-    encrypted: true
-- name: 100GB
-  disk_size: 102400
-  cloud_properties:
-    type: gp2
-    encrypted: true
+        encrypt_keys:
+        - "((consul_encrypt_key))"
+        agent_cert: "((consul_agent.certificate))"
+        agent_key: "((consul_agent.private_key))"
+        ca_cert: "((consul_agent.ca))"
+        server_cert: "((consul_server.certificate))"
+        server_key: "((consul_server.private_key))"
 
-compilation:
-  workers: 6
-  network: private
-  az: z1
-  reuse_compilation_vms: true
-  vm_type: c3.large
-  vm_extensions:
-  - 100GB_ephemeral_disk
-networks:
-- name: private
-  type: manual
-  subnets:
-  - az: z1
-    gateway: ((z1_gateway))
-    range: ((z1_cidr))
-    reserved: ((z1_reserved_ips))
-    static: ((z1_static_ips))
-    cloud_properties:
-      subnet: ((z1_subnet_id))
-  - az: z3
-    gateway: 10.0.6.1
-    range: 10.0.6.0/24
-    reserved:
-    - 10.0.6.0-10.0.6.3
-    - 10.0.6.255
-    static:
-    - 10.0.6.190-10.0.6.254   
-    cloud_properties:
-      subnet: subnet-08375d6c
-  - az: z2
-    gateway: ((z2_gateway))
-    range: ((z2_cidr))
-    reserved: ((z2_reserved_ips))
-    static: ((z2_static_ips))    
-    cloud_properties:
-      subnet: ((z2_subnet_id))
-  - az: services
-    gateway: 10.0.7.1
-    range: 10.0.7.0/24
-    reserved:
-    - 10.0.7.0-10.0.7.3
-    - 10.0.7.255
-    static:
-    - 10.0.7.190-10.0.7.254   
-    cloud_properties:
-      subnet: subnet-3c5f2e58
+    networks:
+    - name: public
+      default: [dns, gateway]
+    - name: vip
+      static_ips: [50.18.208.252]  
 
-- name: public
-  type: manual
-  subnets:
-  - az: z1
-    gateway: 172.31.16.1
-    range: 172.31.16.1/24
-    reserved: 
-    - 172.31.16.0-172.31.16.20
-    - 172.31.16.255
-    static: 
-    - 172.31.16.190-172.31.16.254 
-    cloud_properties:
-      subnet: subnet-6f43d90b
+- type: replace
+  path: /variables/-
+  value:   
+    name: ha_proxy_ssl_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: haproxysslCA 
 
-  - az: z2
-    gateway: 172.31.0.1
-    range: 172.31.0.1/24
-    reserved: 
-    - 172.31.0.0-172.31.0.20
-    - 172.31.0.255
-    static: 
-    - 172.31.0.190-172.31.0.254 
-    cloud_properties:
-      subnet: subnet-d60da68e     
-
-- name: vip
-  type: vip
-
-
-vm_extensions:
-- name: 5GB_ephemeral_disk
-  cloud_properties:
-    ephemeral_disk:
-      size: 5120
-      type: gp2
-      encrypted: true
-- name: 10GB_ephemeral_disk
-  cloud_properties:
-    ephemeral_disk:
-      size: 10240
-      type: gp2
-      encrypted: true
-- name: 50GB_ephemeral_disk
-  cloud_properties:
-    ephemeral_disk:
-      size: 51200
-      type: gp2
-      encrypted: true
-- name: 100GB_ephemeral_disk
-  cloud_properties:
-    ephemeral_disk:
-      size: 102400
-      type: gp2
-      encrypted: true
-
-- name: cf-internet-required
-  cloud_properties:
-    ephemeral_external_ip: true
-
-- name: cf-internet-not-required
-  cloud_properties: 
-    ephemeral_external_ip: false
-    
-- name: internet-required
-  cloud_properties:
-    ephemeral_external_ip: true    
-
-- name: router-lb
-  cloud_properties:
-    elbs:
-    - ((router_lb))
-    security_groups: ((router_lb_security_groups))
-- name: ssh-proxy-lb
-  cloud_properties:
-    elbs:
-    - ((ssh_proxy_lb))
-    security_groups: ((ssh_proxy_lb_security_groups))
-    
-- name: cf-tcp-router-network-properties
-  cloud_properties:
-    ports:
-    - host: 1024-1123  
-
-- name: ha_proxy
-  cloud_properties:
-    security_groups: 
-    - web
-    - bosh_security_group
-    
-    
+- type: replace
+  path: /variables/-
+  value: 
+    name: ha_proxy_ssl
+    type: certificate
+    options:
+      ca: ha_proxy_ssl_ca
+      common_name: ((system_domain))
+      alternative_names: 
+      - "apps.((system_domain))"
+      - "*.apps.((system_domain))"
+      - "*.sys.((system_domain))"
+      - "sys.((system_domain))"
+      - "uaa.sys.((system_domain))"
+      - "*.uaa.sys.((system_domain))"
+      - "login.sys.((system_domain))"
+      - "*.login.sys.((system_domain))"
