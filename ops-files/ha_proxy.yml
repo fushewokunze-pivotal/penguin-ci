@@ -146,7 +146,7 @@ networks:
     static: 
     - 172.31.0.190-172.31.0.254 
     cloud_properties:
-      subnet: subnet-0d119f55     
+      subnet: subnet-d60da68e     
 
 - name: vip
   type: vip
