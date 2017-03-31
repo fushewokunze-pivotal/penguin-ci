@@ -1,0 +1,213 @@
+azs:
+- name: z1
+  cloud_properties:
+    availability_zone: ((z1))
+- name: z2
+  cloud_properties:
+    availability_zone: ((z2))
+- name: z3
+  cloud_properties:
+    availability_zone: us-west-1c
+- name: services
+  cloud_properties:
+    availability_zone: us-west-1c
+
+vm_types:
+- name: m3.medium
+  cloud_properties:
+    instance_type: m3.medium
+    ephemeral_disk:
+      size: 1024
+      type: gp2
+      encrypted: true
+- name: m3.large
+  cloud_properties:
+    instance_type: m3.large
+    ephemeral_disk:
+      size: 1024
+      type: gp2
+      encrypted: true
+- name: c3.large
+  cloud_properties:
+    instance_type: c3.large
+    ephemeral_disk:
+      size: 1024
+      type: gp2
+      encrypted: true
+- name: r3.xlarge
+  cloud_properties:
+    instance_type: r3.xlarge
+    ephemeral_disk:
+      size: 1024
+      type: gp2
+      encrypted: true
+- name: t2.small
+  cloud_properties:
+    instance_type: t2.small
+    ephemeral_disk:
+      size: 1024
+      type: gp2
+      encrypted: true
+
+disk_types:
+- name: 1GB
+  disk_size: 1024
+  cloud_properties:
+    type: gp2
+    encrypted: true
+- name: 5GB
+  disk_size: 5120
+  cloud_properties:
+    type: gp2
+    encrypted: true
+- name: 10GB
+  disk_size: 10240
+  cloud_properties:
+    type: gp2
+    encrypted: true
+- name: 50GB
+  disk_size: 51200
+  cloud_properties:
+    type: gp2
+    encrypted: true
+- name: 100GB
+  disk_size: 102400
+  cloud_properties:
+    type: gp2
+    encrypted: true
+
+compilation:
+  workers: 6
+  network: private
+  az: z1
+  reuse_compilation_vms: true
+  vm_type: c3.large
+  vm_extensions:
+  - 100GB_ephemeral_disk
+networks:
+- name: private
+  type: manual
+  subnets:
+  - az: z1
+    gateway: ((z1_gateway))
+    range: ((z1_cidr))
+    reserved: ((z1_reserved_ips))
+    static: ((z1_static_ips))
+    cloud_properties:
+      subnet: ((z1_subnet_id))
+  - az: z3
+    gateway: 10.0.6.1
+    range: 10.0.6.0/24
+    reserved:
+    - 10.0.6.0-10.0.6.3
+    - 10.0.6.255
+    static:
+    - 10.0.6.190-10.0.6.254   
+    cloud_properties:
+      subnet: subnet-348f056c
+  - az: z2
+    gateway: ((z2_gateway))
+    range: ((z2_cidr))
+    reserved: ((z2_reserved_ips))
+    static: ((z2_static_ips))    
+    cloud_properties:
+      subnet: ((z2_subnet_id))
+  - az: services
+    gateway: 10.0.7.1
+    range: 10.0.7.0/24
+    reserved:
+    - 10.0.7.0-10.0.7.3
+    - 10.0.7.255
+    static:
+    - 10.0.7.190-10.0.7.254   
+    cloud_properties:
+      subnet: subnet-368f056e
+
+- name: public
+  type: manual
+  subnets:
+  - az: z1
+    gateway: 10.0.8.1
+    range: 10.0.8.1/24
+    reserved: 
+    - 10.0.8.0-10.0.8.20
+    - 10.0.8.255
+    static: 
+    - 10.0.8.190-10.0.8.254 
+    cloud_properties:
+      subnet: subnet-4e2c572a
+
+  - az: z2
+    gateway: 10.0.9.1
+    range: 10.0.9.1/24
+    reserved: 
+    - 10.0.9.0-10.0.9.20
+    - 10.0.9.255
+    static: 
+    - 10.0.9.190-10.0.9.254 
+    cloud_properties:
+      subnet: subnet-3e38435a     
+
+- name: vip
+  type: vip
+
+
+vm_extensions:
+- name: 5GB_ephemeral_disk
+  cloud_properties:
+    ephemeral_disk:
+      size: 5120
+      type: gp2
+      encrypted: true
+- name: 10GB_ephemeral_disk
+  cloud_properties:
+    ephemeral_disk:
+      size: 10240
+      type: gp2
+      encrypted: true
+- name: 50GB_ephemeral_disk
+  cloud_properties:
+    ephemeral_disk:
+      size: 51200
+      type: gp2
+      encrypted: true
+- name: 100GB_ephemeral_disk
+  cloud_properties:
+    ephemeral_disk:
+      size: 102400
+      type: gp2
+      encrypted: true
+
+- name: cf-internet-required
+  cloud_properties:
+    ephemeral_external_ip: true
+
+- name: cf-internet-not-required
+  cloud_properties: 
+    ephemeral_external_ip: false
+    
+- name: internet-required
+  cloud_properties:
+    ephemeral_external_ip: true    
+
+- name: router-lb
+  cloud_properties:
+    elbs:
+    - ((router_lb))
+    security_groups: ((router_lb_security_groups))
+- name: ssh-proxy-lb
+  cloud_properties:
+    elbs:
+    - ((ssh_proxy_lb))
+    security_groups: ((ssh_proxy_lb_security_groups))
+    
+- name: cf-tcp-router-network-properties
+  cloud_properties:
+    ports:
+    - host: 1024-1123  
+
+- name: ha_proxy
+  cloud_properties:
+    security_groups: 
+    - web
+    - bosh_security_group
