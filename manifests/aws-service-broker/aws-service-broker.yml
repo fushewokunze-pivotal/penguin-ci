@@ -662,7 +662,7 @@ instance_groups:
           Password: ((mysql_admin_password))
           Host: ((mysql_host))
           Port: 3306
-          Database: aws_service_broker
+          Database: cf_aws_service_broker
           Certificate: 
         Quotas:
           c8ea63d4-696e-43f6-b500-27ed734190a6: 100
