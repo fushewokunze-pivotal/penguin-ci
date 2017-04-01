@@ -87,6 +87,8 @@
     networks:
     - name: public
       default: [dns, gateway]
+    - name: private
+      default: [dns, gateway]  
     - name: vip
       static_ips: [52.53.84.169]  
 
