@@ -106,7 +106,7 @@
     type: certificate
     options:
       ca: ha_proxy_ssl_ca
-      common_name: ((system_domain))
+      common_name: ((apps_domain))
       alternative_names: 
       - "((apps_domain))"
       - "*.((apps_domain))"
