@@ -108,8 +108,8 @@
       ca: ha_proxy_ssl_ca
       common_name: ((system_domain))
       alternative_names: 
-      - "apps.((system_domain))"
-      - "*.apps.((system_domain))"
+      - "((apps_domain))"
+      - "*.((apps_domain))"
       - "*.((system_domain))"
       - "((system_domain))"
       - "uaa.((system_domain))"
