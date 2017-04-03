@@ -11,7 +11,6 @@ bosh -n deploy cf-deployment/cf-deployment.yml \
   --ops-file cf-deployment/opsfiles/change-logging-port-for-aws-elb.yml \
   --ops-file cf-deployment/opsfiles/disable-router-tls-termination.yml \
   --ops-file penguin-ci/ops-files/ha_proxy.yml \
-  --ops-file cf-deployment/opsfiles/tcp-routing-gcp.yml \
   --ops-file p-ert/pivotal-defaults.yml \
   --ops-file p-ert/mysql-proxy.yml \
   --ops-file p-ert/mysql-monitoring.yml \
