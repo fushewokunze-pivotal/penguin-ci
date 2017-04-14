@@ -186,7 +186,7 @@ _Note_: The filenames include double quotation marks, which are required due to 
 
 ## Terraform
 
-Create a file terraform-aws.tfvars.yml
+Create a file terraform-aws.tfvars.yml in GCS
 
 ```
 env_name: "penguin"
@@ -202,7 +202,7 @@ parent_hosted_zone_id: ""
 dns_suffix: "yourdomain.com"
 ```
 
-Create these directories:
+Create these directories in GCS:
 
 ```
 terraform-environment-dbs/
