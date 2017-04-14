@@ -142,16 +142,103 @@ with your your private repo.
 
 In a separate location on your file system - Create a file with the following credentials. (DO NOT CHECK THIS FILE INTO GIT!!)
 
+Create a Google Storage account and retrieve the credentials required
+
 ```
 $ vi credentials.yml
 
-penguin_env_private_key:
-penguin_aws_access_key_id: 
-penguin_aws_secret_access_key: 
-penguin_lbs_ssl_cert:
-penguin_lbs_ssl_signing_key:
-penguin_domain:
+p-ert-branch: 1.9
+set_to_tag_filter_to_lock_cf_deployment: ignoreme
+google_json_key: |
+  {
+  "type": "service_account",
+  "project_id": "project_id",
+  "private_key_id": "private_key_id",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n ... "
+  "client_email": "your_email@developer.gserviceaccount.com",
+  "client_id": "client_id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "client_x509_cert_url"
+  }
+gcs_access_key_id: gcs_access_key_id:
+gcs_secret_access_key: gcs_secret_access_key:
+env_name: penguin
+credhub-encryption-key: credhub-encryption-key:
+ssh-username: admin
+smtp_host_name: smtp.gmail.com
+smtp_host_port: 465
+smtp_sender_username: bla@example.com
+smtp_sender_password: bla
+
 ```
+
+## Seed a new environment
+
+To create a new environment, you must first seed your GCS bucket with some empty files. For an environment named new-environment, the following must be created:
+
+- "new-environment"-bosh-vars-store.yml
+- "new-environment"-bosh-state.json
+  - This file must be valid JSON, so the contents should be `{}`
+
+_Note_: The filenames include double quotation marks, which are required due to Concourse's parameter interpolation.
+
+## Terraform
+
+Create a file terraform-aws.tfvars.yml
+
+```
+env_name: "penguin"
+access_key: "access_key"
+secret_key: "secret_key:"
+public_key: "ssh-rsa public_key"
+region: "us-west-1"
+availability_zones: ["us-west-1a", "us-west-1c"]
+rds_db_username: "admin"
+rds_instance_class: "db.m3.large"
+rds_instance_count: "1"
+parent_hosted_zone_id: ""
+dns_suffix: "yourdomain.com"
+```
+
+Create these directories:
+
+```
+terraform-environment-dbs/
+terraform-environments/
+```
+
+
+## Types of deployment
+
+### 1.9-ish
+
+To deploy a ERT reminiscent of PCF 1.9, use the `pipelines/pcf-bosh.yml` pipeline, setting these variables:
+
+- set_to_tag_filter_to_lock_cf_deployment=tag_filter
+- p-ert-branch=1.9
+
+_Note_: This includes p-mysql
+
+### Floating
+
+To deploy a ERT using the master of cf-deployment, use the `pipelines/pcf-bosh.yml` pipeline, setting these variables:
+
+- set_to_tag_filter_to_lock_cf_deployment=ignoreme
+- p-ert-branch=master
+
+_Note_: This includes p-mysql
+
+
+### Upgrade
+
+To deploy a pipeline that tests the upgrade process from 1.9 to master, use the `pipelines/upgrade-ert.yml`. No special
+ variables are needed.
+
+ref: https://github.com/pivotal-cf/pcf-bosh-ci/edit/master/README.md
+
+
 
 **Set Concourse pipeline using fly**
 
