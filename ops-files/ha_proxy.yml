@@ -106,13 +106,13 @@
     type: certificate
     options:
       ca: ha_proxy_ssl_ca
-      common_name: ((system_domain))
+      common_name: "*.((apps_domain))"
       alternative_names: 
-      - "apps.((system_domain))"
-      - "*.apps.((system_domain))"
-      - "*.sys.((system_domain))"
-      - "sys.((system_domain))"
-      - "uaa.sys.((system_domain))"
-      - "*.uaa.sys.((system_domain))"
-      - "login.sys.((system_domain))"
-      - "*.login.sys.((system_domain))"
+      - "((apps_domain))"
+      - "*.((apps_domain))"
+      - "*.((system_domain))"
+      - "((system_domain))"
+      - "uaa.((system_domain))"
+      - "*.uaa.((system_domain))"
+      - "login.((system_domain))"
+      - "*.login.((system_domain))"
