@@ -36,13 +36,6 @@ resources:
     uri: https://github.com/fushewokunze-pivotal/pcf-bosh-terraforming-aws.git
     branch: master
 
-- name: terraforming-aws-penguin
-  type: git
-  source:
-    uri: https://github.com/fushewokunze-pivotal/penguin-ci.git
-    branch: master
-    paths: [infrastructure]
-
 - name: terraform
   type: docker-image
   source:
@@ -51,10 +44,9 @@ resources:
 - name: cloud-config
   type: git
   source:
-    #uri: https://github.com/pivotal-cf/p-ert-bosh-experiment
+    #uri: https://github.com/fushewokunze-pivotal/penguin-ci.git
     uri: https://github.com/fushewokunze-pivotal/p-ert-bosh-experiment.git
     branch: "1.9"
-    #branch: master
     paths: [aws/cloud-config.yml]
 
 - name: p-ert-bosh-experiment
@@ -101,13 +93,6 @@ resources:
     bucket: penguin-vars
     json_key: {{google_json_key}}
     versioned_file: closed-source-releases.zip
-
-- name: ipsec-zip
-  type: gcs-resource
-  source:
-    bucket: penguin-vars
-    json_key: {{google_json_key}}
-    versioned_file: ipsec-1.5.37.tgz
 
 - name: ipsec-config
   type: gcs-resource
@@ -162,18 +147,6 @@ resources:
       secret_access_key: {{gcs_secret_access_key}}
       endpoint: storage.googleapis.com
   delete_on_failure: true
-
-#- name: terraform-state-penguin
-#  type: terraform
-#  source:
-#    storage:
-#      bucket: penguin-vars
-#      bucket_path: terraform-environments
-#      access_key_id: {{gcs_access_key_id}}
-#      secret_access_key: {{gcs_secret_access_key}}
-#      endpoint: storage.googleapis.com
-#  delete_on_failure: true
-
 
 - name: terraform-db-state
   type: terraform
@@ -238,26 +211,6 @@ jobs:
       delete_on_failure: true
       env_name: {{env_name}}
 
-- name: terraform-up-penguin
-  plan:
-  - aggregate:
-    - get: pcf-bosh-ci
-    - get: terraforming-aws
-      trigger: true
-      passed: [terraform-up]
-    - get: terraform-vars
-      trigger: true
-    - get: terraform
-      trigger: true
-    - get: terraforming-aws-penguin
-      trigger: true
-  - put: terraform-state
-    params:
-      var_file: terraform-vars/terraform-aws.tfvars.yml
-      terraform_source: terraforming-aws-penguin//infrastructure
-      delete_on_failure: true
-      env_name: {{env_name}}
-
 - name: deploy-director
   plan:
   - aggregate:
@@ -271,7 +224,7 @@ jobs:
     - get: bosh-vars-store
     - get: terraform-state    
       trigger: true
-      passed: [terraform-up-penguin]
+      passed: [terraform-up]
   - task: deploy-director
     file: pcf-bosh-ci/tasks/deploy-director-aws.yml
     ensure:
@@ -302,10 +255,7 @@ jobs:
   plan:
   - aggregate:
     - get: pcf-bosh-ci
-    - get: ipsec-zip
     - get: ipsec-config
-      trigger: true
-    - get: penguin-ci
       trigger: true
     - get: bosh-vars-store
       trigger: true
@@ -315,7 +265,6 @@ jobs:
       passed: [deploy-director]
   - task: update-runtime-config
     file: pcf-bosh-ci/tasks/update-runtime-config.yml
-
 
 - name: upload-stemcell
   plan:
@@ -351,7 +300,6 @@ jobs:
     - get: p-ert
       resource: p-ert-bosh-experiment
       trigger: true
-    #- get: cf-vars-store
     - get: closed-source-releases-zip
     - get: bosh-vars-store
       trigger: true
@@ -360,6 +308,9 @@ jobs:
       passed: [update-runtime-config, upload-cloud-config, upload-stemcell]
     - get: penguin-ci
       trigger: true  
+    - get: ipsec-config
+      trigger: true
+      passed: [update-runtime-config]       
   - task: extract-closed-source-releases
     file: pcf-bosh-ci/tasks/extract-closed-source-releases.yml
   - task: deploy-ert
@@ -459,6 +410,52 @@ jobs:
     params:
       DEPLOYMENT: cf
       ERRAND: push-apps-manager
+
+- name: deploy-aws-service-broker
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+      passed: [deploy-ert]
+      trigger: true
+    - get: penguin-ci
+      passed: [deploy-ert]
+      trigger: true
+    - get: rabbitmq-vars-store
+    - get: bosh-vars-store
+      passed: [deploy-ert]
+      trigger: true
+    - get: terraform-state
+      passed: [deploy-ert]
+      trigger: true
+    - get: cf-deployment
+      passed: [deploy-ert]
+      trigger: true
+  - task: deploy-aws-service-broker
+    file: penguin-ci/tasks/deploy-aws-service-broker.yml
+
+
+- name: aws-service-broker
+  serial: true
+  serial_groups: [cf-bosh-deployment]
+  plan:
+  - aggregate:
+    - get: pcf-bosh-ci
+    - get: bosh-vars-store
+      passed: [deploy-aws-service-broker]
+    - get: terraform-state
+      passed: [deploy-aws-service-broker]
+    - get: cf-deployment
+      passed: [deploy-aws-service-broker]
+    - get: penguin-ci
+      passed: [deploy-ert, deploy-aws-service-broker]
+      trigger: true
+
+  - task: aws-service-broker
+    file: pcf-bosh-ci/tasks/run-errand.yml
+    params:
+      DEPLOYMENT: aws-service-broker
+      ERRAND: deploy-errand
+
 
 #########
 # Tests #
