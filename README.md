@@ -115,6 +115,16 @@ Download fly from Concourse main page and install on path on your machine
 
 ## Setup Concourse
 
+**Set pipeline admin credentials**
+
+If you're using Basic Auth for Concourse, be sure to change the password manually using fly. 
+
+Note: We do not recommend basic auth for anything but testing environments
+
+```
+fly -t penguin set-team -n main --basic-auth-username=admin --basic-auth-password=<complex password>
+```
+
 **Create private git repo**
 
 Create a private git repo to store secrets and set up deploy key as documented here: [https://developer.github.com/guides/managing-deploy-keys/#deploy-keys](https://developer.github.com/guides/managing-deploy-keys/#deploy-keys)
