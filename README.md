@@ -6,14 +6,13 @@ Documentation available here: [https://bosh.io/docs/cli-v2.html](https://bosh.io
 
 **Get bosh bootloader**
 
-```
-git clone https://github.com/cloudfoundry/bosh-bootloader.git
-```
-Full documentation is here: https://github.com/cloudfoundry/bosh-bootloader/blob/master/docs/getting-started-aws.md
+Download the latest release here: [https://github.com/cloudfoundry/bosh-bootloader/releases](https://github.com/cloudfoundry/bosh-bootloader/releases)
+
+Rename the file to `bbl`, install to somewhere in your path and set execute permissions
 
 **Configure AWS**
 
-The AWS IAM user that is provided to bbl will need the following policy:
+Create an AWS IAM user to provide to bbl with the following policy:
 
 ```
 {
@@ -34,6 +33,8 @@ The AWS IAM user that is provided to bbl will need the following policy:
     ]
 }
 ```
+
+Full documentation is here: https://github.com/cloudfoundry/bosh-bootloader/blob/master/docs/getting-started-aws.md
 
 **Create infrastructure and BOSH director**
 
